@@ -1053,12 +1053,12 @@ export function MerchantDashboard({
         {activeTab === 'ACTIVITY' && (
           <div className="space-y-6">
             <header>
-              <h1 className="text-3xl md:text-4xl font-serif-display font-semibold mb-2">Recent Activity</h1>
-              <p className="text-gray-500 text-sm md:text-base">History of recent stamps, redemptions, and new members.</p>
+              <h1 className="text-3xl md:text-4xl font-serif-display font-semibold mb-2">{t('dash.activity.title', { defaultValue: 'Recent Activity' })}</h1>
+              <p className="text-gray-500 text-sm md:text-base">{t('dash.activity.sub', { defaultValue: 'History of recent stamps, redemptions, and new members.' })}</p>
             </header>
             <div className="border notion-border rounded-lg bg-white">
               {activities.length === 0 ? (
-                <div className="text-sm text-gray-400 italic p-8 text-center">No activity recorded yet.</div>
+                <div className="text-sm text-gray-400 italic p-8 text-center">{t('dash.activity.empty', { defaultValue: 'No activity recorded yet.' })}</div>
               ) : (
                 <div className="divide-y notion-border">
                   {activities.map((act) => (
@@ -1078,11 +1078,11 @@ export function MerchantDashboard({
                         <div>
                           <div className="text-sm font-medium text-gray-900 flex items-center gap-2 flex-wrap">
                             <span>
-                              {act.type === 'STAMP' ? `Stamped ${act.customerName}` :
-                                act.type === 'REDEEM' ? `Reward claimed by ${act.customerName}` :
-                                act.type === 'JOIN' ? `${act.customerName} joined the program` :
-                                act.type === 'BLOCK' ? `Blocked ${act.customerName}` :
-                                `Unblocked ${act.customerName}`}
+                              {act.type === 'STAMP' ? t('dash.activity.stamped', { name: act.customerName, defaultValue: 'Stamped {{name}}' }) :
+                                act.type === 'REDEEM' ? t('dash.activity.redeemed', { name: act.customerName, defaultValue: 'Reward claimed by {{name}}' }) :
+                                act.type === 'JOIN' ? t('dash.activity.joined', { name: act.customerName, defaultValue: '{{name}} joined the program' }) :
+                                act.type === 'BLOCK' ? t('dash.activity.blocked', { name: act.customerName, defaultValue: 'Blocked {{name}}' }) :
+                                t('dash.activity.unblocked', { name: act.customerName, defaultValue: 'Unblocked {{name}}' })}
                             </span>
                             {act.source && (
                               <span className={`text-[10px] uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded ${
@@ -1090,11 +1090,11 @@ export function MerchantDashboard({
                                 act.source === 'manual_dashboard' ? 'bg-amber-50 text-amber-700' :
                                 'bg-gray-100 text-gray-600'
                               }`} title={
-                                act.source === 'qr' ? 'Triggered by a real QR scan'
-                                  : act.source === 'manual_dashboard' ? 'Manually clicked in the dashboard'
+                                act.source === 'qr' ? t('dash.activity.srcQrTitle', { defaultValue: 'Triggered by a real QR scan' })
+                                  : act.source === 'manual_dashboard' ? t('dash.activity.srcManualTitle', { defaultValue: 'Manually clicked in the dashboard' })
                                   : act.source
                               }>
-                                {act.source === 'qr' ? 'QR scan' : act.source === 'manual_dashboard' ? 'Manual' : act.source}
+                                {act.source === 'qr' ? t('dash.activity.srcQr', { defaultValue: 'QR scan' }) : act.source === 'manual_dashboard' ? t('dash.activity.srcManual', { defaultValue: 'Manual' }) : act.source}
                               </span>
                             )}
                             {act.locationName && (
@@ -1119,13 +1119,13 @@ export function MerchantDashboard({
           <div className="space-y-6">
             <header className="flex justify-between items-end">
               <div>
-                <h1 className="text-3xl md:text-4xl font-serif-display font-semibold mb-2">Customers</h1>
-                <p className="text-gray-500 text-sm md:text-base">Search by name or customer ID (SF00XXX). Toggle to view blocked or pending-deletion accounts.</p>
+                <h1 className="text-3xl md:text-4xl font-serif-display font-semibold mb-2">{t('dash.customers.title', { defaultValue: 'Customers' })}</h1>
+                <p className="text-gray-500 text-sm md:text-base">{t('dash.customers.sub', { defaultValue: 'Search by name or customer ID (SF00XXX). Toggle to view blocked or pending-deletion accounts.' })}</p>
               </div>
               <div className="flex items-center gap-3">
                 <div className="relative hidden md:block">
                   <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input type="text" placeholder="Name or SF00001..." value={customerSearch}
+                  <input type="text" placeholder={t('dash.customers.searchPh', { defaultValue: 'Name or SF00001...' })} value={customerSearch}
                     onChange={(e) => setCustomerSearch(e.target.value)}
                     className="pl-9 pr-4 py-1.5 bg-white border notion-border rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 w-64" />
                 </div>
@@ -1135,17 +1135,17 @@ export function MerchantDashboard({
                   title="Download the filtered list as CSV"
                   className="text-sm px-3 py-2 rounded border notion-border hover:bg-[#F7F7F5] disabled:opacity-40 flex items-center gap-1.5"
                 >
-                  <Download className="w-4 h-4" /> <span className="hidden sm:inline">Export CSV</span>
+                  <Download className="w-4 h-4" /> <span className="hidden sm:inline">{t('dash.customers.exportCsv', { defaultValue: 'Export CSV' })}</span>
                 </button>
                 <button onClick={() => setIsAddCustomerModalOpen(true)} className="text-sm text-white px-3 py-2 rounded hover:bg-opacity-90 flex items-center gap-1 shadow-sm"
                   style={{ backgroundColor: campaign.primaryColor }}>
-                  <Plus className="w-4 h-4" /> New
+                  <Plus className="w-4 h-4" /> {t('dash.customers.new', { defaultValue: 'New' })}
                 </button>
               </div>
             </header>
             <div className="md:hidden mb-4 relative">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input type="text" placeholder="Name or SF00001..." value={customerSearch}
+              <input type="text" placeholder={t('dash.customers.searchPh', { defaultValue: 'Name or SF00001...' })} value={customerSearch}
                 onChange={(e) => setCustomerSearch(e.target.value)}
                 className="pl-9 pr-4 py-2.5 bg-white border notion-border rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 w-full" />
             </div>
@@ -1153,12 +1153,12 @@ export function MerchantDashboard({
             {/* Quick segment pills */}
             <div className="flex flex-wrap items-center gap-2 mb-3">
               {([
-                ['all', 'All', segCounts.all],
-                ['top', 'Top spenders', segCounts.top],
-                ['ready', 'Reward ready', segCounts.ready],
-                ['close', 'One away', segCounts.close],
-                ['new', 'New this week', segCounts.new],
-                ['inactive', 'Inactive 30d+', segCounts.inactive],
+                ['all', t('dash.customers.segAll', { defaultValue: 'All' }), segCounts.all],
+                ['top', t('dash.customers.segTop', { defaultValue: 'Top spenders' }), segCounts.top],
+                ['ready', t('dash.customers.segReady', { defaultValue: 'Reward ready' }), segCounts.ready],
+                ['close', t('dash.customers.segClose', { defaultValue: 'One away' }), segCounts.close],
+                ['new', t('dash.customers.segNew', { defaultValue: 'New this week' }), segCounts.new],
+                ['inactive', t('dash.customers.segInactive', { defaultValue: 'Inactive 30d+' }), segCounts.inactive],
               ] as const).map(([id, label, count]) => (
                 <button
                   key={id}
@@ -1181,17 +1181,17 @@ export function MerchantDashboard({
                 className="bg-white border notion-border rounded-md px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-gray-300"
                 title="Filter by when they joined"
               >
-                <option value="all">Joined: any time</option>
-                <option value="7">Joined: last 7 days</option>
-                <option value="30">Joined: last 30 days</option>
-                <option value="90">Joined: last 90 days</option>
-                <option value="custom">Joined: custom range…</option>
+                <option value="all">{t('dash.customers.joinedAny', { defaultValue: 'Joined: any time' })}</option>
+                <option value="7">{t('dash.customers.joined7', { defaultValue: 'Joined: last 7 days' })}</option>
+                <option value="30">{t('dash.customers.joined30', { defaultValue: 'Joined: last 30 days' })}</option>
+                <option value="90">{t('dash.customers.joined90', { defaultValue: 'Joined: last 90 days' })}</option>
+                <option value="custom">{t('dash.customers.joinedCustom', { defaultValue: 'Joined: custom range…' })}</option>
               </select>
               {joinedFilter === 'custom' && (
                 <>
                   <input type="date" value={joinedFrom} onChange={(e) => setJoinedFrom(e.target.value)}
                     className="bg-white border notion-border rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-gray-300" />
-                  <span className="text-gray-400">to</span>
+                  <span className="text-gray-400">{t('dash.customers.to', { defaultValue: 'to' })}</span>
                   <input type="date" value={joinedTo} onChange={(e) => setJoinedTo(e.target.value)}
                     className="bg-white border notion-border rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-gray-300" />
                 </>
@@ -1202,10 +1202,10 @@ export function MerchantDashboard({
                 className="bg-white border notion-border rounded-md px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-gray-300"
                 title="Based on the last stamp or redemption"
               >
-                <option value="all">Activity: all</option>
-                <option value="active30">Active (last 30 days)</option>
-                <option value="dormant30">Dormant (30+ days)</option>
-                <option value="never">Never stamped</option>
+                <option value="all">{t('dash.customers.actAll', { defaultValue: 'Activity: all' })}</option>
+                <option value="active30">{t('dash.customers.actActive', { defaultValue: 'Active (last 30 days)' })}</option>
+                <option value="dormant30">{t('dash.customers.actDormant', { defaultValue: 'Dormant (30+ days)' })}</option>
+                <option value="never">{t('dash.customers.actNever', { defaultValue: 'Never stamped' })}</option>
               </select>
               <select
                 value={rewardFilter}
@@ -1213,28 +1213,28 @@ export function MerchantDashboard({
                 className="bg-white border notion-border rounded-md px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-gray-300"
                 title="Where they are on the card"
               >
-                <option value="all">Reward: all</option>
-                <option value="ready">Reward ready to claim</option>
-                <option value="close">One stamp away</option>
-                <option value="redeemed">Has redeemed before</option>
+                <option value="all">{t('dash.customers.rewAll', { defaultValue: 'Reward: all' })}</option>
+                <option value="ready">{t('dash.customers.rewReady', { defaultValue: 'Reward ready to claim' })}</option>
+                <option value="close">{t('dash.customers.rewClose', { defaultValue: 'One stamp away' })}</option>
+                <option value="redeemed">{t('dash.customers.rewRedeemed', { defaultValue: 'Has redeemed before' })}</option>
               </select>
               {(joinedFilter !== 'all' || engagementFilter !== 'all' || rewardFilter !== 'all' || segment !== 'all') && (
                 <button
                   onClick={() => { setJoinedFilter('all'); setJoinedFrom(''); setJoinedTo(''); setEngagementFilter('all'); setRewardFilter('all'); setSegment('all'); }}
                   className="px-2.5 py-1.5 rounded-md border notion-border text-gray-500 hover:bg-[#F7F7F5]"
                 >
-                  Clear filters
+                  {t('dash.customers.clearFilters', { defaultValue: 'Clear filters' })}
                 </button>
               )}
-              <span className="text-gray-400 ml-auto">{filteredCards.length} shown</span>
+              <span className="text-gray-400 ml-auto">{filteredCards.length} {t('dash.customers.shown', { defaultValue: 'shown' })}</span>
             </div>
 
             {/* Status filter chips — Active | Blocked | Pending deletion */}
             <div className="flex flex-wrap gap-2">
               {([
-                ['active',           'Active',           bucketCounts.active,           'bg-green-50 text-green-700 border-green-200'],
-                ['blocked',          'Blocked',          bucketCounts.blocked,          'bg-red-50 text-red-700 border-red-200'],
-                ['pending_deletion', 'Pending deletion', bucketCounts.pending_deletion, 'bg-amber-50 text-amber-700 border-amber-200'],
+                ['active',           t('dash.customers.active', { defaultValue: 'Active' }),           bucketCounts.active,           'bg-green-50 text-green-700 border-green-200'],
+                ['blocked',          t('dash.customers.blocked', { defaultValue: 'Blocked' }),          bucketCounts.blocked,          'bg-red-50 text-red-700 border-red-200'],
+                ['pending_deletion', t('dash.customers.pendingDeletion', { defaultValue: 'Pending deletion' }), bucketCounts.pending_deletion, 'bg-amber-50 text-amber-700 border-amber-200'],
               ] as const).map(([id, label, count, activeStyle]) => {
                 const isActive = customerStatusFilter === id;
                 return (
@@ -1263,13 +1263,13 @@ export function MerchantDashboard({
                         <span className="text-[10px] font-mono text-gray-400">{card.customerCode ?? ''}</span>
                       </div>
                       <div className="text-xs text-gray-500"><RevealableEmail email={card.email} /></div>
-                      <div className="text-[11px] text-gray-400">Joined {card.joinedAt.toLocaleDateString()}</div>
+                      <div className="text-[11px] text-gray-400">{t('dash.customers.joinedLabel', { defaultValue: 'Joined' })} {card.joinedAt.toLocaleDateString()}</div>
                       <div className="flex gap-1 flex-wrap">
                         <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
                           card.status === 'BLOCKED' ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'
-                        }`}>{card.currentStamps} Stamps</span>
+                        }`}>{card.currentStamps} {t('dash.customers.stamps', { defaultValue: 'Stamps' })}</span>
                         {card.deletionRequestedAt && (
-                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 uppercase">Pending deletion</span>
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 uppercase">{t('dash.customers.pendingDeletion', { defaultValue: 'Pending deletion' })}</span>
                         )}
                       </div>
                     </div>
@@ -1277,7 +1277,7 @@ export function MerchantDashboard({
                       {card.status !== 'BLOCKED' && (
                         card.currentStamps >= (card.maxStampsSnapshot ?? campaign.maxStamps) ? (
                           <button onClick={() => onResetCard(card.id)} className="px-3 h-8 rounded-full bg-green-50 text-green-600 text-xs font-semibold flex items-center justify-center">
-                            Redeem
+                            {t('dash.customers.redeem', { defaultValue: 'Redeem' })}
                           </button>
                         ) : (
                           <button onClick={() => onStampCard(card.id)} className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
@@ -1293,7 +1293,7 @@ export function MerchantDashboard({
                   </div>
                 ))}
                 {filteredCards.length === 0 && (
-                  <div className="p-8 text-center text-gray-400 italic text-sm">{customerStatusFilter === "blocked" ? "No blocked customers." : customerStatusFilter === "pending_deletion" ? "No customers are pending deletion." : "No customers found."}</div>
+                  <div className="p-8 text-center text-gray-400 italic text-sm">{customerStatusFilter === "blocked" ? t('dash.customers.noBlocked', { defaultValue: 'No blocked customers.' }) : customerStatusFilter === "pending_deletion" ? t('dash.customers.noPending', { defaultValue: 'No customers are pending deletion.' }) : t('dash.customers.noFound', { defaultValue: 'No customers found.' })}</div>
                 )}
               </div>
 
@@ -1301,15 +1301,15 @@ export function MerchantDashboard({
               <table className="w-full text-sm text-left min-w-[820px] hidden md:table">
                 <thead className="bg-[#F7F7F5] text-gray-500 font-medium">
                   <tr>
-                    <th className="px-4 py-3 border-b notion-border w-24">ID</th>
-                    <th className="px-4 py-3 border-b notion-border">Name</th>
-                    <th className="px-4 py-3 border-b notion-border">Email</th>
-                    <th className="px-4 py-3 border-b notion-border">Joined on</th>
-                    <th className="px-4 py-3 border-b notion-border">Campaign offer</th>
-                    <th className="px-4 py-3 border-b notion-border">Progress</th>
-                    <th className="px-4 py-3 border-b notion-border">Redeemed</th>
-                    <th className="px-4 py-3 border-b notion-border">Status</th>
-                    <th className="px-4 py-3 border-b notion-border w-28">Action</th>
+                    <th className="px-4 py-3 border-b notion-border w-24">{t('dash.customers.colId', { defaultValue: 'ID' })}</th>
+                    <th className="px-4 py-3 border-b notion-border">{t('dash.customers.colName', { defaultValue: 'Name' })}</th>
+                    <th className="px-4 py-3 border-b notion-border">{t('dash.customers.colEmail', { defaultValue: 'Email' })}</th>
+                    <th className="px-4 py-3 border-b notion-border">{t('dash.customers.colJoined', { defaultValue: 'Joined on' })}</th>
+                    <th className="px-4 py-3 border-b notion-border">{t('dash.customers.colOffer', { defaultValue: 'Campaign offer' })}</th>
+                    <th className="px-4 py-3 border-b notion-border">{t('dash.customers.colProgress', { defaultValue: 'Progress' })}</th>
+                    <th className="px-4 py-3 border-b notion-border">{t('dash.customers.colRedeemed', { defaultValue: 'Redeemed' })}</th>
+                    <th className="px-4 py-3 border-b notion-border">{t('dash.customers.colStatus', { defaultValue: 'Status' })}</th>
+                    <th className="px-4 py-3 border-b notion-border w-28">{t('dash.customers.colAction', { defaultValue: 'Action' })}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y notion-border">
@@ -1331,7 +1331,7 @@ export function MerchantDashboard({
                       <td className="px-4 py-3 text-xs">
                         <div className="text-gray-700 truncate max-w-[180px]" title={cardOffer}>{cardOffer}</div>
                         {isStale && (
-                          <div className="text-[10px] text-amber-600 mt-0.5" title="The merchant has changed the offer since this customer joined. They'll migrate to the new offer when they redeem.">(was — auto-migrates on redeem)</div>
+                          <div className="text-[10px] text-amber-600 mt-0.5" title={t('dash.customers.wasMigrateTitle', { defaultValue: "The merchant has changed the offer since this customer joined. They'll migrate to the new offer when they redeem." })}>{t('dash.customers.wasMigrate', { defaultValue: '(was — auto-migrates on redeem)' })}</div>
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -1348,13 +1348,13 @@ export function MerchantDashboard({
                       <td className="px-4 py-3 text-gray-600 font-mono">{card.rewardsRedeemed}</td>
                       <td className="px-4 py-3">
                         {card.deletionRequestedAt ? (
-                          <span className="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-xs font-bold uppercase tracking-wider" title="Customer requested deletion. Will be removed within 24 hours.">Pending deletion</span>
+                          <span className="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-xs font-bold uppercase tracking-wider" title={t('dash.customers.pendingDeletionTitle', { defaultValue: 'Customer requested deletion. Will be removed within 24 hours.' })}>{t('dash.customers.pendingDeletion', { defaultValue: 'Pending deletion' })}</span>
                         ) : card.status === 'BLOCKED' ? (
-                          <span className="bg-red-100 text-red-600 px-1.5 py-0.5 rounded text-xs font-bold uppercase tracking-wider">Blocked</span>
+                          <span className="bg-red-100 text-red-600 px-1.5 py-0.5 rounded text-xs font-bold uppercase tracking-wider">{t('dash.customers.blocked', { defaultValue: 'Blocked' })}</span>
                         ) : card.currentStamps >= cardMax ? (
-                          <span className="bg-green-100 text-green-700 px-1.5 py-0.5 rounded text-xs font-medium">Reward Ready</span>
+                          <span className="bg-green-100 text-green-700 px-1.5 py-0.5 rounded text-xs font-medium">{t('dash.customers.rewardReady', { defaultValue: 'Reward Ready' })}</span>
                         ) : (
-                          <span className="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded text-xs">Collecting</span>
+                          <span className="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded text-xs">{t('dash.customers.collecting', { defaultValue: 'Collecting' })}</span>
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -1362,19 +1362,19 @@ export function MerchantDashboard({
                           {card.status !== 'BLOCKED' && (
                             <>
                               {card.currentStamps >= cardMax ? (
-                                <button onClick={() => onResetCard(card.id)} className="text-green-600 hover:underline text-xs font-medium">Redeem</button>
+                                <button onClick={() => onResetCard(card.id)} className="text-green-600 hover:underline text-xs font-medium">{t('dash.customers.redeem', { defaultValue: 'Redeem' })}</button>
                               ) : (
-                                <button onClick={() => onStampCard(card.id)} className="text-blue-600 hover:underline text-xs font-medium">+Stamp</button>
+                                <button onClick={() => onStampCard(card.id)} className="text-blue-600 hover:underline text-xs font-medium">{t('dash.customers.addStamp', { defaultValue: '+Stamp' })}</button>
                               )}
                               <div className="h-4 w-px bg-gray-200 mx-1"></div>
                             </>
                           )}
                           <button onClick={() => setConfirmAction({ type: 'BLOCK', cardId: card.id, name: card.customerName })}
-                            className="text-gray-400 hover:text-orange-500 transition" title={card.status === 'BLOCKED' ? 'Unblock' : 'Block'}>
+                            className="text-gray-400 hover:text-orange-500 transition" title={card.status === 'BLOCKED' ? t('dash.customers.unblock', { defaultValue: 'Unblock' }) : t('dash.customers.block', { defaultValue: 'Block' })}>
                             <Ban className="w-4 h-4" />
                           </button>
                           <button onClick={() => setConfirmAction({ type: 'DELETE', cardId: card.id, name: card.customerName })}
-                            className="text-gray-400 hover:text-red-500 transition" title="Delete">
+                            className="text-gray-400 hover:text-red-500 transition" title={t('dash.customers.delete', { defaultValue: 'Delete' })}>
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -1383,9 +1383,9 @@ export function MerchantDashboard({
                   );})}
                   {filteredCards.length === 0 && (
                     <tr><td colSpan={8} className="px-4 py-8 text-center text-gray-400 italic">
-                      {customerStatusFilter === 'blocked' ? 'No blocked customers.'
-                        : customerStatusFilter === 'pending_deletion' ? 'No customers are pending deletion.'
-                        : 'No customers found.'}
+                      {customerStatusFilter === 'blocked' ? t('dash.customers.noBlocked', { defaultValue: 'No blocked customers.' })
+                        : customerStatusFilter === 'pending_deletion' ? t('dash.customers.noPending', { defaultValue: 'No customers are pending deletion.' })
+                        : t('dash.customers.noFound', { defaultValue: 'No customers found.' })}
                     </td></tr>
                   )}
                 </tbody>

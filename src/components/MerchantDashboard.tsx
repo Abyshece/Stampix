@@ -1689,13 +1689,13 @@ export function MerchantDashboard({
             {settingsSection === 'stamping' && (
               <div className="bg-white rounded-lg border notion-border p-6 space-y-5 max-w-2xl">
                 <div>
-                  <h3 className="text-lg font-semibold">Stamping mode</h3>
-                  <p className="text-sm text-gray-500 mt-1">Choose how customers collect stamps.</p>
+                  <h3 className="text-lg font-semibold">{t('dash.set.stampingH3', { defaultValue: 'Stamping mode' })}</h3>
+                  <p className="text-sm text-gray-500 mt-1">{t('dash.set.stampingSub', { defaultValue: 'Choose how customers collect stamps.' })}</p>
                 </div>
                 <div className="space-y-3">
                   {([
-                    ['scanner', 'Scanner (staff scans)', 'A staff member scans the customer\u2019s wallet QR to give a stamp. Needs a phone at the counter.'],
-                    ['self_serve', 'Self-serve (customer scans)', 'No device needed at the counter. The customer scans your printed stamp QR on their own phone; a location check confirms they\u2019re at the shop.'],
+                    ['scanner', t('dash.set.modeScanner', { defaultValue: 'Scanner (staff scans)' }), t('dash.set.modeScannerDesc', { defaultValue: 'A staff member scans the customer\u2019s wallet QR to give a stamp. Needs a phone at the counter.' })],
+                    ['self_serve', t('dash.set.modeSelf', { defaultValue: 'Self-serve (customer scans)' }), t('dash.set.modeSelfDesc', { defaultValue: 'No device needed at the counter. The customer scans your printed stamp QR on their own phone; a location check confirms they\u2019re at the shop.' })],
                   ] as const).map(([mode, title, desc]) => (
                     <button
                       key={mode}
@@ -1715,23 +1715,23 @@ export function MerchantDashboard({
                 {(tempSettings.stampingMode ?? 'scanner') === 'self_serve' && (
                   <div className="space-y-4 pt-2 border-t notion-border">
                     <div>
-                      <label className="text-sm font-medium">Location radius (metres)</label>
-                      <p className="text-xs text-gray-500 mb-2">Customers must be within this distance of the shop to get a stamp. 100m recommended (GPS is fuzzy indoors).</p>
+                      <label className="text-sm font-medium">{t('dash.set.radiusLabel', { defaultValue: 'Location radius (metres)' })}</label>
+                      <p className="text-xs text-gray-500 mb-2">{t('dash.set.radiusHint', { defaultValue: 'Customers must be within this distance of the shop to get a stamp. 100m recommended (GPS is fuzzy indoors).' })}</p>
                       <input type="number" min={30} max={1000} value={tempSettings.selfServeRadius ?? 100}
                         onChange={(e) => setTempSettings({ ...tempSettings, selfServeRadius: Math.max(30, Math.min(1000, Number(e.target.value) || 100)) })}
                         className="w-32 bg-white border notion-border rounded px-3 py-2 text-sm" />
                     </div>
                     <div>
-                      <label className="text-sm font-medium">Stamp code (4 digits)</label>
-                      <p className="text-xs text-gray-500 mb-2">Printed under your counter stamp QR. A customer can type it if their camera can\u2019t scan.</p>
-                      <input value={tempSettings.stampCode ?? ''} maxLength={4} inputMode="numeric" placeholder="e.g. 4821"
+                      <label className="text-sm font-medium">{t('dash.set.codeLabel', { defaultValue: 'Stamp code (4 digits)' })}</label>
+                      <p className="text-xs text-gray-500 mb-2">{t('dash.set.codeHint', { defaultValue: 'Printed under your counter stamp QR. A customer can type it if their camera can\u2019t scan.' })}</p>
+                      <input value={tempSettings.stampCode ?? ''} maxLength={4} inputMode="numeric" placeholder={t('dash.set.codePh', { defaultValue: 'e.g. 4821' })}
                         onChange={(e) => setTempSettings({ ...tempSettings, stampCode: e.target.value.replace(/[^0-9]/g, '').slice(0, 4) })}
                         className="w-32 bg-white border notion-border rounded px-3 py-2 text-sm tracking-widest" />
                     </div>
                   </div>
                 )}
                 <div className="flex justify-end pt-2">
-                  <button onClick={handleSaveSettings} className="bg-[#37352F] text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-opacity-90 transition">Save</button>
+                  <button onClick={handleSaveSettings} className="bg-[#37352F] text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-opacity-90 transition">{t('dash.set.save', { defaultValue: 'Save' })}</button>
                 </div>
               </div>
             )}
@@ -1772,8 +1772,8 @@ export function MerchantDashboard({
 
             {settingsSection === 'posters' && (
             <div className="border notion-border rounded-lg p-6 space-y-4">
-              <h3 className="font-medium">Posters &amp; pamphlets</h3>
-              <p className="text-sm text-gray-500">Download your printable posters and pamphlets &mdash; in English or German &mdash; from the <span className="font-medium">Share &amp; Promote</span> tab.</p>
+              <h3 className="font-medium">{t('dash.set.postersH3', { defaultValue: 'Posters & pamphlets' })}</h3>
+              <p className="text-sm text-gray-500">{t('dash.set.postersBodyA', { defaultValue: 'Download your printable posters and pamphlets — in English or German — from the' })} <span className="font-medium">{t('dash.nav.sharePromote', { defaultValue: 'Share & Promote' })}</span> {t('dash.set.postersBodyB', { defaultValue: 'tab.' })}</p>
             </div>
             )}
 
@@ -1798,9 +1798,9 @@ export function MerchantDashboard({
                 account, customers, and activity history. */}
             {settingsSection === 'privacy' && (
             <div className="bg-white rounded-lg border notion-border p-6 space-y-2">
-              <h3 className="text-base font-semibold">Your data</h3>
+              <h3 className="text-base font-semibold">{t('dash.set.dataH3', { defaultValue: 'Your data' })}</h3>
               <p className="text-sm text-gray-500">
-                Download a complete JSON copy of your account, customers, locations, and activity log.
+                {t('dash.set.dataBody', { defaultValue: 'Download a complete JSON copy of your account, customers, locations, and activity log.' })}
               </p>
               <DownloadMyDataButton variant="merchant" />
             </div>
@@ -1820,36 +1820,33 @@ export function MerchantDashboard({
             <div className="border notion-border rounded-lg p-6 space-y-8">
             {settingsSection === 'general' && (
               <div>
-                <h3 className="font-medium mb-4 flex items-center gap-2"><Settings className="w-4 h-4" /> General Configuration</h3> <InfoHint text="Existing cards keep the offer they were issued with. Changing the offer or stamp count affects new cards, and existing ones update after their next reward." label="general configuration" />
+                <h3 className="font-medium mb-4 flex items-center gap-2"><Settings className="w-4 h-4" /> {t('dash.set.genH3', { defaultValue: 'General Configuration' })}</h3> <InfoHint text={t('dash.set.genInfo', { defaultValue: 'Existing cards keep the offer they were issued with. Changing the offer or stamp count affects new cards, and existing ones update after their next reward.' })} label="general configuration" />
                 <div className="bg-blue-50 border border-blue-100 rounded-md p-3 mb-4 text-xs text-blue-800 leading-relaxed">
-                  <strong>How offer changes work:</strong> When you change the offer title or
-                  required stamps, only <strong>new customers</strong> get the updated offer.
-                  Existing customers keep working toward the offer they originally signed up for.
-                  Once they redeem their reward, their next cycle automatically uses your current offer.
+                  <strong>{t('dash.set.offerChTitle', { defaultValue: 'How offer changes work:' })}</strong> {t('dash.set.offerChA', { defaultValue: 'When you change the offer title or required stamps, only' })} <strong>{t('dash.set.offerChBold', { defaultValue: 'new customers' })}</strong> {t('dash.set.offerChB', { defaultValue: 'get the updated offer. Existing customers keep working toward the offer they originally signed up for. Once they redeem their reward, their next cycle automatically uses your current offer.' })}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-gray-400 uppercase">Business Name</label>
+                    <label className="text-xs font-bold text-gray-400 uppercase">{t('dash.set.businessName', { defaultValue: 'Business Name' })}</label>
                     <input value={tempSettings.businessName}
                       onChange={(e) => setTempSettings({ ...tempSettings, businessName: e.target.value })}
                       className="w-full bg-[#F7F7F5] border notion-border rounded px-3 py-2 text-sm" />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-gray-400 uppercase">Offer Title</label>
+                    <label className="text-xs font-bold text-gray-400 uppercase">{t('dash.set.offerTitle', { defaultValue: 'Offer Title' })}</label>
                     <input value={tempSettings.offerTitle}
                       onChange={(e) => setTempSettings({ ...tempSettings, offerTitle: e.target.value })}
                       className="w-full bg-[#F7F7F5] border notion-border rounded px-3 py-2 text-sm" />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-gray-400 uppercase">Primary Color</label>
+                    <label className="text-xs font-bold text-gray-400 uppercase">{t('dash.set.primaryColor', { defaultValue: 'Primary Color' })}</label>
                     <select value={tempSettings.primaryColor}
                       onChange={(e) => setTempSettings({ ...tempSettings, primaryColor: e.target.value })}
                       className="w-full bg-[#F7F7F5] border notion-border rounded px-3 py-2 text-sm">
-                      {NOTION_COLORS.map((c) => <option key={c.hex} value={c.hex}>{c.name}</option>)}
+                      {NOTION_COLORS.map((c) => <option key={c.hex} value={c.hex}>{t(`dash.color.${c.name.toLowerCase()}`, { defaultValue: c.name })}</option>)}
                     </select>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-gray-400 uppercase">Max Stamps</label>
+                    <label className="text-xs font-bold text-gray-400 uppercase">{t('dash.set.maxStamps', { defaultValue: 'Max Stamps' })}</label>
                     <select value={tempSettings.maxStamps}
                       onChange={(e) => setTempSettings({ ...tempSettings, maxStamps: parseInt(e.target.value) })}
                       className="w-full bg-[#F7F7F5] border notion-border rounded px-3 py-2 text-sm">
@@ -1862,7 +1859,7 @@ export function MerchantDashboard({
 
             {settingsSection === 'wallet' && (
               <div className="border-t notion-border pt-6">
-                <h3 className="font-medium mb-4 flex items-center gap-2"><Palette className="w-4 h-4" /> Customise your wallet</h3> <InfoHint text="Colours apply to the card in the customer's wallet — not to your posters. Text colour is picked automatically for contrast unless you override it." label="wallet colours" />
+                <h3 className="font-medium mb-4 flex items-center gap-2"><Palette className="w-4 h-4" /> {t('dash.set.walletH3', { defaultValue: 'Customise your wallet' })}</h3> <InfoHint text={t('dash.set.walletInfo', { defaultValue: "Colours apply to the card in the customer's wallet — not to your posters. Text colour is picked automatically for contrast unless you override it." })} label="wallet colours" />
                 <WalletLivePreview
                   settings={{
                     businessName: tempSettings.businessName,
@@ -1876,10 +1873,10 @@ export function MerchantDashboard({
                     logoMode: tempSettings.logoMode ?? 'stampfix',
                   }}
                 />
-                <ProLockOverlay locked={!isPro} title="Card colour & custom branding are Pro features" onUpgrade={() => setShowUpgradeModal(true)}>
+                <ProLockOverlay locked={!isPro} title={t('dash.set.proTitle', { defaultValue: 'Card colour & custom branding are Pro features' })} onUpgrade={() => setShowUpgradeModal(true)}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-gray-400 uppercase">Card Color</label>
+                    <label className="text-xs font-bold text-gray-400 uppercase">{t('dash.set.cardColor', { defaultValue: 'Card Color' })}</label>
                     <div className="flex gap-2 items-center">
                       <input type="color" value={tempSettings.backgroundColor || '#f0ece1'}
                         onChange={(e) => setTempSettings({ ...tempSettings, backgroundColor: e.target.value })}
@@ -1888,10 +1885,10 @@ export function MerchantDashboard({
                         onChange={(e) => setTempSettings({ ...tempSettings, backgroundColor: e.target.value })}
                         className="flex-1 bg-[#F7F7F5] border notion-border rounded px-3 py-2 text-sm font-mono" />
                     </div>
-                    <p className="text-[11px] text-gray-400">Background of the wallet card on Apple &amp; Google.</p>
+                    <p className="text-[11px] text-gray-400">{t('dash.set.cardColorHint', { defaultValue: 'Background of the wallet card on Apple & Google.' })}</p>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-gray-400 uppercase">Text Color</label>
+                    <label className="text-xs font-bold text-gray-400 uppercase">{t('dash.set.textColor', { defaultValue: 'Text Color' })}</label>
                     <div className="flex gap-2 items-center">
                       <input type="color" value={tempSettings.cardTextColor || '#1d3458'}
                         onChange={(e) => setTempSettings({ ...tempSettings, cardTextColor: e.target.value })}
@@ -1902,11 +1899,11 @@ export function MerchantDashboard({
                     </div>
                     <div className="mt-1.5 flex items-start gap-2 bg-red-50 border border-red-200 rounded-md px-3 py-2 text-[11px] text-red-700 leading-relaxed">
                       <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
-                      <span>Applies to Apple Wallet only. Google Wallet (Android) picks the text color automatically for contrast, so this won't affect the Android card.</span>
+                      <span>{t('dash.set.textColorWarn', { defaultValue: "Applies to Apple Wallet only. Google Wallet (Android) picks the text color automatically for contrast, so this won't affect the Android card." })}</span>
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-gray-400 uppercase">Logo Color</label>
+                    <label className="text-xs font-bold text-gray-400 uppercase">{t('dash.set.logoColor', { defaultValue: 'Logo Color' })}</label>
                     <div className="flex gap-2 items-center">
                       <input type="color"
                         value={tempSettings.logoColor || (isDarkColor(tempSettings.backgroundColor || '#f0ece1') ? '#FFFFFF' : '#111827')}
@@ -1922,15 +1919,15 @@ export function MerchantDashboard({
                       onClick={() => setTempSettings({ ...tempSettings, logoColor: null })}
                       className="inline-flex items-center gap-1.5 text-[11px] text-gray-500 hover:text-[#37352F] transition"
                     >
-                      <RotateCcw className="w-3 h-3" /> Back to default color (black)
+                      <RotateCcw className="w-3 h-3" /> {t('dash.set.logoColorReset', { defaultValue: 'Back to default color (black)' })}
                     </button>
                     {!tempSettings.logoColor && isDarkColor(tempSettings.backgroundColor || '#f0ece1') && (
                       <div className="mt-1.5 flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-md px-3 py-2 text-[11px] text-amber-700 leading-relaxed">
                         <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
-                        <span>Colour automatically switched to a light logo because your card colour is dark.</span>
+                        <span>{t('dash.set.logoColorAuto', { defaultValue: 'Colour automatically switched to a light logo because your card colour is dark.' })}</span>
                       </div>
                     )}
-                    <p className="text-[11px] text-gray-400">The square / circle / cross mark on your card.</p>
+                    <p className="text-[11px] text-gray-400">{t('dash.set.logoColorHint', { defaultValue: 'The square / circle / cross mark on your card.' })}</p>
                   </div>
                 </div>
                 <button
@@ -1938,16 +1935,16 @@ export function MerchantDashboard({
                   onClick={() => setTempSettings({ ...tempSettings, backgroundColor: '#f0ece1', cardTextColor: '#1d3458' })}
                   className="mb-6 inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#37352F] transition"
                 >
-                  <RotateCcw className="w-3 h-3" /> Reset to default colors
+                  <RotateCcw className="w-3 h-3" /> {t('dash.set.resetColors', { defaultValue: 'Reset to default colors' })}
                 </button>
                 <div className="space-y-3 max-w-xl">
-                  <label className="text-xs font-bold text-gray-400 uppercase">Card logo</label> <InfoHint label="the card logo" text="Upload a square PNG, about 512×512px (at least ~200×200px), with a transparent background and under 1 MB. Apple Wallet shows it small in the card's top-left; Google Wallet crops it to a circle — so a square, transparent logo looks best on both." />
-                  <p className="text-xs text-gray-400 -mt-1">What appears at the top of the wallet card, next to your name.</p>
+                  <label className="text-xs font-bold text-gray-400 uppercase">{t('dash.set.cardLogo', { defaultValue: 'Card logo' })}</label> <InfoHint label="the card logo" text={t('dash.set.cardLogoInfo', { defaultValue: "Upload a square PNG, about 512×512px (at least ~200×200px), with a transparent background and under 1 MB. Apple Wallet shows it small in the card's top-left; Google Wallet crops it to a circle — so a square, transparent logo looks best on both." })} />
+                  <p className="text-xs text-gray-400 -mt-1">{t('dash.set.cardLogoSub', { defaultValue: 'What appears at the top of the wallet card, next to your name.' })}</p>
                   <div className="grid sm:grid-cols-3 gap-2">
                     {([
-                      ['stampfix', 'Stampfix mark', 'The \u25aa\u25cf\u2715 symbol'],
-                      ['custom',   'Your own logo', 'Upload an image'],
-                      ['none',     'Text only',     'No logo at all'],
+                      ['stampfix', t('dash.set.logoStampfix', { defaultValue: 'Stampfix mark' }), t('dash.set.logoStampfixDesc', { defaultValue: 'The \u25aa\u25cf\u2715 symbol' })],
+                      ['custom',   t('dash.set.logoCustom', { defaultValue: 'Your own logo' }), t('dash.set.logoCustomDesc', { defaultValue: 'Upload an image' })],
+                      ['none',     t('dash.set.logoNone', { defaultValue: 'Text only' }), t('dash.set.logoNoneDesc', { defaultValue: 'No logo at all' })],
                     ] as const).map(([mode, title, hint]) => {
                       const on = (tempSettings.logoMode ?? 'stampfix') === mode;
                       return (
@@ -1967,12 +1964,12 @@ export function MerchantDashboard({
                     <div className="space-y-1 pt-1">
                       <div className="flex items-start gap-2 text-xs text-red-700 bg-red-50 border border-red-100 rounded-md p-2.5">
                         <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
-                        <span>Requirements: PNG, square, at least 200×200px, and under 1 MB. Files outside these limits are rejected.</span>
+                        <span>{t('dash.set.logoReq', { defaultValue: 'Requirements: PNG, square, at least 200×200px, and under 1 MB. Files outside these limits are rejected.' })}</span>
                       </div>
                       <div className="flex gap-2 items-center">
                         <label className="flex-1 cursor-pointer bg-[#F7F7F5] border notion-border border-dashed rounded h-10 flex items-center justify-center text-xs text-gray-500 hover:bg-gray-100 transition">
                           <Upload className="w-3 h-3 mr-2" />
-                          {logoUploading ? 'Uploading…' : tempSettings.logoImage ? 'Change file' : 'Choose file'}
+                          {logoUploading ? t('dash.set.uploading', { defaultValue: 'Uploading…' }) : tempSettings.logoImage ? t('dash.set.changeFile', { defaultValue: 'Change file' }) : t('dash.set.chooseFile', { defaultValue: 'Choose file' })}
                           <input type="file" className="hidden" accept="image/png" onChange={handleLogoUpload} />
                         </label>
                         {tempSettings.logoImage && (
@@ -1983,7 +1980,7 @@ export function MerchantDashboard({
                         )}
                       </div>
                       {!tempSettings.logoImage && (
-                        <p className="text-xs text-amber-700">No image uploaded yet — the card shows your text until you add one.</p>
+                        <p className="text-xs text-amber-700">{t('dash.set.noImage', { defaultValue: 'No image uploaded yet — the card shows your text until you add one.' })}</p>
                       )}
                     </div>
                   )}
@@ -1995,20 +1992,20 @@ export function MerchantDashboard({
               <div className="flex justify-end gap-3 pt-4 border-t notion-border">
                 <button onClick={() => setTempSettings(campaign)}
                   className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900 transition font-medium border border-transparent hover:border-gray-200 rounded">
-                  Cancel
+                  {t('dash.set.cancel', { defaultValue: 'Cancel' })}
                 </button>
                 <button onClick={handleSaveSettings}
                   className="px-6 py-2 bg-[#37352F] text-white rounded text-sm font-medium hover:bg-opacity-90 transition shadow-sm">
-                  Save Changes
+                  {t('dash.set.saveChanges', { defaultValue: 'Save Changes' })}
                 </button>
               </div>
 
               <div className="border-t notion-border pt-6 flex justify-between items-center">
                 <div className="text-xs text-gray-400 flex items-center gap-2">
-                  <RotateCcw className="w-3 h-3" /> Data synced to Supabase
+                  <RotateCcw className="w-3 h-3" /> {t('dash.set.synced', { defaultValue: 'Data synced to Supabase' })}
                 </div>
                 <button onClick={onLogout} className="text-red-500 text-sm hover:underline flex items-center gap-1">
-                  <LogOut className="w-3 h-3" /> Sign out
+                  <LogOut className="w-3 h-3" /> {t('dash.set.signOut', { defaultValue: 'Sign out' })}
                 </button>
               </div>
             </div>

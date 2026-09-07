@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FileText, Loader2, Check } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useTranslation } from 'react-i18next';
 
 interface ComplianceData {
   country: 'DE' | 'CA' | null;
@@ -23,6 +24,7 @@ interface ComplianceData {
  * the country-specific minimum is filled.
  */
 export function ComplianceSettings({ merchantId }: { merchantId: string }) {
+  const { t } = useTranslation();
   const [data, setData] = useState<ComplianceData>({
     country: null,
     legal_entity_name: '',
@@ -80,7 +82,7 @@ export function ComplianceSettings({ merchantId }: { merchantId: string }) {
       setSavedAt(Date.now());
       setTimeout(() => setSavedAt(null), 3000);
     } catch (e) {
-      alert(e instanceof Error ? e.message : 'Could not save');
+      alert(e instanceof Error ? e.message : t('dash.compliance.errSave', { defaultValue: 'Could not save' }));
     } finally {
       setSaving(false);
     }
@@ -104,31 +106,31 @@ export function ComplianceSettings({ merchantId }: { merchantId: string }) {
     <div className="bg-white rounded-lg border notion-border p-6 space-y-5">
       <div>
         <h3 className="text-lg font-semibold flex items-center gap-2">
-          <FileText className="w-5 h-5 text-gray-500" /> Business Registration
+          <FileText className="w-5 h-5 text-gray-500" /> {t('dash.compliance.title', { defaultValue: 'Business Registration' })}
         </h3>
         <p className="text-sm text-gray-500 mt-1">
-          Required before upgrading to Pro. Used on invoices and for tax purposes.
+          {t('dash.compliance.sub', { defaultValue: 'Required before upgrading to Pro. Used on invoices and for tax purposes.' })}
         </p>
       </div>
 
       {country && (
         <div className="bg-[#F7F7F5] border notion-border rounded-md p-3 text-xs text-gray-600 flex items-center gap-2">
           <span className="text-lg">{country === 'DE' ? '🇩🇪' : '🇨🇦'}</span>
-          <span>Country: <strong>{country === 'DE' ? 'Germany' : 'Canada'}</strong>. To change, contact support.</span>
+          <span>{t('dash.compliance.country', { defaultValue: 'Country:' })} <strong>{country === 'DE' ? t('dash.compliance.germany', { defaultValue: 'Germany' }) : t('dash.compliance.canada', { defaultValue: 'Canada' })}</strong>{t('dash.compliance.toChange', { defaultValue: '. To change, contact support.' })}</span>
         </div>
       )}
 
       <Field
-        label="Legal entity name"
-        hint="Full registered name (e.g. 'Acme GmbH' or 'Acme Ltd.')"
+        label={t('dash.compliance.legalName', { defaultValue: 'Legal entity name' })}
+        hint={t('dash.compliance.legalNameHint', { defaultValue: "Full registered name (e.g. 'Acme GmbH' or 'Acme Ltd.')" })}
         value={data.legal_entity_name}
         onChange={(v) => setData({ ...data, legal_entity_name: v })}
         placeholder="Acme GmbH"
       />
 
       <Field
-        label="Registered business address"
-        hint="The address on your business registration."
+        label={t('dash.compliance.address', { defaultValue: 'Registered business address' })}
+        hint={t('dash.compliance.addressHint', { defaultValue: 'The address on your business registration.' })}
         value={data.business_address}
         onChange={(v) => setData({ ...data, business_address: v })}
         placeholder="Friedrichstraße 123, 10117 Berlin, Germany"
@@ -138,15 +140,15 @@ export function ComplianceSettings({ merchantId }: { merchantId: string }) {
       {country === 'DE' && (
         <>
           <Field
-            label="Handelsregister number"
-            hint="Commercial register entry, e.g. 'HRB 123456'."
+            label={t('dash.compliance.hrb', { defaultValue: 'Handelsregister number' })}
+            hint={t('dash.compliance.hrbHint', { defaultValue: "Commercial register entry, e.g. 'HRB 123456'." })}
             value={data.de_register_number}
             onChange={(v) => setData({ ...data, de_register_number: v })}
             placeholder="HRB 123456"
           />
           <Field
-            label="VAT ID (USt-IdNr.)"
-            hint="Required for reverse-charge B2B invoicing within the EU."
+            label={t('dash.compliance.vat', { defaultValue: 'VAT ID (USt-IdNr.)' })}
+            hint={t('dash.compliance.vatHint', { defaultValue: 'Required for reverse-charge B2B invoicing within the EU.' })}
             value={data.de_vat_id}
             onChange={(v) => setData({ ...data, de_vat_id: v })}
             placeholder="DE123456789"
@@ -156,8 +158,8 @@ export function ComplianceSettings({ merchantId }: { merchantId: string }) {
 
       {country === 'CA' && (
         <Field
-          label="Business Number (BN)"
-          hint="9-digit CRA business number, optionally with the program suffix (e.g. 'RT0001' for GST/HST)."
+          label={t('dash.compliance.bn', { defaultValue: 'Business Number (BN)' })}
+          hint={t('dash.compliance.bnHint', { defaultValue: "9-digit CRA business number, optionally with the program suffix (e.g. 'RT0001' for GST/HST)." })}
           value={data.ca_business_number}
           onChange={(v) => setData({ ...data, ca_business_number: v })}
           placeholder="123456789 RT0001"
@@ -168,10 +170,10 @@ export function ComplianceSettings({ merchantId }: { merchantId: string }) {
         <div className="text-xs text-gray-400">
           {savedAt ? (
             <span className="text-green-600 flex items-center gap-1">
-              <Check className="w-3 h-3" /> Saved
+              <Check className="w-3 h-3" /> {t('dash.compliance.saved', { defaultValue: 'Saved' })}
             </span>
           ) : (
-            <>Changes are saved manually.</>
+            <>{t('dash.compliance.manualSave', { defaultValue: 'Changes are saved manually.' })}</>
           )}
         </div>
         <button
@@ -180,7 +182,7 @@ export function ComplianceSettings({ merchantId }: { merchantId: string }) {
           className="bg-[#37352F] text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-opacity-90 transition disabled:opacity-50 flex items-center gap-2"
         >
           {saving && <Loader2 className="w-4 h-4 animate-spin" />}
-          Save changes
+          {t('dash.compliance.saveChanges', { defaultValue: 'Save changes' })}
         </button>
       </div>
     </div>

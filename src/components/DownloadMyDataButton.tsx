@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Download, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useTranslation } from 'react-i18next';
 
 /**
  * GDPR Art. 20 / PIPEDA Principle 9 data export button.
@@ -19,6 +20,7 @@ export function DownloadMyDataButton({
   variant: 'customer' | 'merchant';
   className?: string;
 }) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -50,7 +52,7 @@ export function DownloadMyDataButton({
       a.click();
       URL.revokeObjectURL(url);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Download failed');
+      setError(e instanceof Error ? e.message : t('dash.data.errDownload', { defaultValue: 'Download failed' }));
     } finally {
       setLoading(false);
     }
@@ -64,7 +66,7 @@ export function DownloadMyDataButton({
         className="inline-flex items-center gap-2 text-sm border notion-border bg-white rounded-md px-3 py-1.5 hover:bg-[#F7F7F5] disabled:opacity-60 transition"
       >
         {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
-        Download my data
+        {t('dash.data.download', { defaultValue: 'Download my data' })}
       </button>
       {error && (
         <div className="mt-2 text-xs text-red-600">{error}</div>

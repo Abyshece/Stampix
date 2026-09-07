@@ -8,6 +8,7 @@ import { toPng } from 'html-to-image';
 import { useToast } from './ToastProvider';
 import { ProLockOverlay } from './ProLockOverlay';
 import { logMerchantActivity } from '../lib/db';
+import { useTranslation } from 'react-i18next';
 
 interface PosterSettingsProps {
   campaign: Campaign;
@@ -46,6 +47,7 @@ const GRAD_DEFAULTS = { from: '#1E40AF', to: '#7C3AED', angle: 135 };
  * solids and gradients are treated identically.
  */
 export function PosterSettings({ campaign, onUpdated, isPro, onUpgrade }: PosterSettingsProps) {
+  const { t } = useTranslation();
   const stored = campaign.posterColor;
 
   // Detect what kind of value is currently saved.
@@ -85,10 +87,10 @@ export function PosterSettings({ campaign, onUpdated, isPro, onUpgrade }: Poster
       const updated = await updateCampaign(campaign.id, { posterColor: computedValue });
       onUpdated(updated);
       setSavedAt(Date.now());
-      toast.success('Poster appearance saved');
+      toast.success(t('dash.poster.toastSaved', { defaultValue: 'Poster appearance saved' }));
       setTimeout(() => setSavedAt(null), 3000);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Could not save poster color';
+      const msg = e instanceof Error ? e.message : t('dash.poster.errSave', { defaultValue: 'Could not save poster color' });
       toast.error(msg);
     } finally {
       setSaving(false);
@@ -138,21 +140,21 @@ export function PosterSettings({ campaign, onUpdated, isPro, onUpgrade }: Poster
       link.click();
     } catch (err) {
       console.error('[poster png]', err);
-      alert('Could not generate the PNG — please try again.');
+      alert(t('dash.poster.errPng', { defaultValue: 'Could not generate the PNG — please try again.' }));
     } finally {
       document.body.removeChild(holder);
     }
   };
 
   return (
-    <ProLockOverlay locked={!isPro} title="Custom poster colours are a Pro feature" onUpgrade={onUpgrade}>
+    <ProLockOverlay locked={!isPro} title={t('dash.poster.proTitle', { defaultValue: 'Custom poster colours are a Pro feature' })} onUpgrade={onUpgrade}>
     <div className="bg-white rounded-lg border notion-border p-6 space-y-6">
       <div>
         <h3 className="text-lg font-semibold flex items-center gap-2">
-          <Palette className="w-5 h-5 text-gray-500" /> Poster appearance
+          <Palette className="w-5 h-5 text-gray-500" /> {t('dash.poster.title', { defaultValue: 'Poster appearance' })}
         </h3>
         <p className="text-sm text-gray-500 mt-1">
-          Pick the background color for the printable posters customers see at your counter.
+          {t('dash.poster.sub', { defaultValue: 'Pick the background color for the printable posters customers see at your counter.' })}
         </p>
       </div>
 
@@ -161,7 +163,7 @@ export function PosterSettings({ campaign, onUpdated, isPro, onUpgrade }: Poster
         className="rounded-lg h-24 border notion-border flex items-center justify-center font-serif-display text-2xl font-semibold tracking-wide shadow-inner"
         style={{ background: previewBg, color: previewInk }}
       >
-        SCAN &amp; SAVE
+        {t('dash.poster.scanSave', { defaultValue: 'SCAN & SAVE' })}
       </div>
 
       {/* Mode selector */}
@@ -169,15 +171,15 @@ export function PosterSettings({ campaign, onUpdated, isPro, onUpgrade }: Poster
         <ModeRow
           active={mode === 'white'}
           onClick={() => setMode('white')}
-          label="White (default)"
-          hint="Clean white background — recommended for print."
+          label={t('dash.poster.white', { defaultValue: 'White (default)' })}
+          hint={t('dash.poster.whiteHint', { defaultValue: 'Clean white background — recommended for print.' })}
           swatch="#FFFFFF"
         />
         <ModeRow
           active={mode === 'preset'}
           onClick={() => setMode('preset')}
-          label="Pick a preset"
-          hint="Three brand-friendly solid colors."
+          label={t('dash.poster.preset', { defaultValue: 'Pick a preset' })}
+          hint={t('dash.poster.presetHint', { defaultValue: 'Three brand-friendly solid colors.' })}
         >
           {mode === 'preset' && (
             <div className="flex gap-3 pt-3">
@@ -189,7 +191,7 @@ export function PosterSettings({ campaign, onUpdated, isPro, onUpgrade }: Poster
                     presetValue === p.value ? 'border-[#37352F] ring-2 ring-[#37352F]/20' : 'border-transparent'
                   }`}
                   style={{ background: p.value }}
-                  aria-label={p.label}
+                  aria-label={t(`dash.poster.preset_${p.id}`, { defaultValue: p.label })}
                 >
                   {presetValue === p.value && <Check className="w-5 h-5 text-white" strokeWidth={3} />}
                 </button>
@@ -200,16 +202,16 @@ export function PosterSettings({ campaign, onUpdated, isPro, onUpgrade }: Poster
         <ModeRow
           active={mode === 'gradient'}
           onClick={() => setMode('gradient')}
-          label="Custom gradient"
-          hint="Pick any two colors and an angle."
+          label={t('dash.poster.gradient', { defaultValue: 'Custom gradient' })}
+          hint={t('dash.poster.gradientHint', { defaultValue: 'Pick any two colors and an angle.' })}
         >
           {mode === 'gradient' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3">
-              <ColorPicker label="From" value={gradFrom} onChange={setGradFrom} />
-              <ColorPicker label="To"   value={gradTo}   onChange={setGradTo} />
+              <ColorPicker label={t('dash.poster.from', { defaultValue: 'From' })} value={gradFrom} onChange={setGradFrom} />
+              <ColorPicker label={t('dash.poster.to', { defaultValue: 'To' })} value={gradTo} onChange={setGradTo} />
               <div className="col-span-2 space-y-1">
                 <label className="text-xs font-medium text-gray-600 flex justify-between">
-                  <span>Angle</span>
+                  <span>{t('dash.poster.angle', { defaultValue: 'Angle' })}</span>
                   <span className="text-gray-400">{gradAngle}°</span>
                 </label>
                 <input
@@ -226,10 +228,10 @@ export function PosterSettings({ campaign, onUpdated, isPro, onUpgrade }: Poster
 
       {/* Wallet card colour on the poster */}
       <div className="space-y-2 pt-3 border-t notion-border">
-        <label className="text-sm font-medium">Wallet card colour</label>
-        <p className="text-xs text-gray-400 -mt-1">The sample loyalty card shown on the poster. Auto uses a white card on a coloured background, and a black card on a white one.</p>
+        <label className="text-sm font-medium">{t('dash.poster.cardColour', { defaultValue: 'Wallet card colour' })}</label>
+        <p className="text-xs text-gray-400 -mt-1">{t('dash.poster.cardColourHint', { defaultValue: 'The sample loyalty card shown on the poster. Auto uses a white card on a coloured background, and a black card on a white one.' })}</p>
         <div className="flex gap-2 pt-1">
-          {([['', 'Auto'], ['#FFFFFF', 'White'], ['#111318', 'Black']] as const).map(([val, label]) => (
+          {([['', t('dash.poster.auto', { defaultValue: 'Auto' })], ['#FFFFFF', t('dash.poster.cardWhite', { defaultValue: 'White' })], ['#111318', t('dash.poster.cardBlack', { defaultValue: 'Black' })]] as const).map(([val, label]) => (
             <button
               key={label}
               onClick={() => setCardColor(val)}
@@ -241,48 +243,48 @@ export function PosterSettings({ campaign, onUpdated, isPro, onUpgrade }: Poster
           ))}
         </div>
         <div className="pt-1">
-          <ColorPicker label="Or a custom card colour" value={/^#[0-9a-fA-F]{6}$/.test(cardColor) ? cardColor : '#FFFFFF'} onChange={setCardColor} />
+          <ColorPicker label={t('dash.poster.customCardColour', { defaultValue: 'Or a custom card colour' })} value={/^#[0-9a-fA-F]{6}$/.test(cardColor) ? cardColor : '#FFFFFF'} onChange={setCardColor} />
         </div>
       </div>
 
       {/* Preview links */}
       <div className="flex flex-wrap gap-2 pt-2 border-t notion-border">
-        <span className="text-xs text-gray-400 self-center mr-2">Download as PNG:</span>
+        <span className="text-xs text-gray-400 self-center mr-2">{t('dash.poster.downloadPng', { defaultValue: 'Download as PNG:' })}</span>
         <button
           onClick={() => handlePreview('card')}
           className="text-xs px-3 py-1.5 rounded-md border notion-border hover:bg-[#F7F7F5] transition"
         >
-          Business card
+          {t('dash.poster.businessCard', { defaultValue: 'Business card' })}
         </button>
         <button
           onClick={() => handlePreview('loyalty')}
           className="text-xs px-3 py-1.5 rounded-md border notion-border hover:bg-[#F7F7F5] transition"
         >
-          Pamphlet
+          {t('dash.poster.pamphlet', { defaultValue: 'Pamphlet' })}
         </button>
         <button
           onClick={() => handlePreview('selfscan')}
           className="text-xs px-3 py-1.5 rounded-md border notion-border hover:bg-[#F7F7F5] transition"
         >
-          Self-scan poster
+          {t('dash.poster.selfScan', { defaultValue: 'Self-scan poster' })}
         </button>
         <button
           onClick={() => handlePreview('sticker')}
           className="text-xs px-3 py-1.5 rounded-md border notion-border hover:bg-[#F7F7F5] transition"
         >
-          Sticker sheet (A4)
+          {t('dash.poster.stickerSheet', { defaultValue: 'Sticker sheet (A4)' })}
         </button>
         <button
           onClick={() => { downloadInstagramPng(campaign, previewBg); logMerchantActivity('poster_downloaded', { type: 'instagram' }); }}
           className="text-xs px-3 py-1.5 rounded-md bg-[#37352F] text-white hover:opacity-90 transition"
         >
-          ⬇ Instagram PNG
+          {t('dash.poster.instagramPng', { defaultValue: '⬇ Instagram PNG' })}
         </button>
         <button
           onClick={() => downloadTableQrPng(campaign, previewBg)}
           className="text-xs px-3 py-1.5 rounded-md bg-[#37352F] text-white hover:opacity-90 transition"
         >
-          ⬇ Table QR PNG
+          {t('dash.poster.tableQrPng', { defaultValue: '⬇ Table QR PNG' })}
         </button>
       </div>
 
@@ -291,10 +293,10 @@ export function PosterSettings({ campaign, onUpdated, isPro, onUpgrade }: Poster
         <div className="text-xs">
           {savedAt ? (
             <span className="text-green-600 flex items-center gap-1">
-              <Check className="w-3 h-3" /> Saved
+              <Check className="w-3 h-3" /> {t('dash.poster.saved', { defaultValue: 'Saved' })}
             </span>
           ) : (
-            <span className="text-gray-400">Changes apply next time you download a poster.</span>
+            <span className="text-gray-400">{t('dash.poster.changesApply', { defaultValue: 'Changes apply next time you download a poster.' })}</span>
           )}
         </div>
         <button
@@ -303,7 +305,7 @@ export function PosterSettings({ campaign, onUpdated, isPro, onUpgrade }: Poster
           className="bg-[#37352F] text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-opacity-90 transition disabled:opacity-50 flex items-center gap-2"
         >
           {saving && <Loader2 className="w-4 h-4 animate-spin" />}
-          Save
+          {t('dash.poster.save', { defaultValue: 'Save' })}
         </button>
       </div>
     </div>

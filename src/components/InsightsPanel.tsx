@@ -4,6 +4,7 @@ import {
   ArrowUp, ArrowDown, Minus, Clock, Sparkles,
 } from 'lucide-react';
 import type { ActivityItem, Campaign, Location, UserCard } from '../types';
+import { useTranslation } from 'react-i18next';
 
 type DateRange = 'today' | 'yesterday' | '7d' | '30d' | 'this_month' | 'last_month' | 'custom';
 type LocationFilter = 'all' | string; // location id or 'all'
@@ -71,6 +72,7 @@ function resolveRange(
 }
 
 export function InsightsPanel({ campaign, cards, activities, locations }: InsightsPanelProps) {
+  const { t } = useTranslation();
   const [range, setRange] = useState<DateRange>('30d');
   const [customFrom, setCustomFrom] = useState('');
   const [customTo, setCustomTo] = useState('');
@@ -217,37 +219,37 @@ export function InsightsPanel({ campaign, cards, activities, locations }: Insigh
     <div className="space-y-8 animate-in fade-in duration-500">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl md:text-4xl font-serif-display font-semibold mb-2">Insights</h1>
+          <h1 className="text-3xl md:text-4xl font-serif-display font-semibold mb-2">{t('dash.insights.title', { defaultValue: 'Insights' })}</h1>
           <p className="text-gray-500 text-sm md:text-base">
-            How your loyalty program is performing
-            {locFilter === 'all' ? ' across all locations' : ` at ${locations.find((l) => l.id === locFilter)?.name ?? 'this location'}`}
-            {offerFilter !== 'all' && ` · offer "${offerFilter.length > 30 ? offerFilter.slice(0, 28) + '…' : offerFilter}"`}.
+            {t('dash.insights.subMain', { defaultValue: 'How your loyalty program is performing' })}
+            {locFilter === 'all' ? t('dash.insights.allLocations', { defaultValue: ' across all locations' }) : ` ${t('dash.insights.atLoc', { defaultValue: 'at' })} ${locations.find((l) => l.id === locFilter)?.name ?? t('dash.insights.thisLocation', { defaultValue: 'this location' })}`}
+            {offerFilter !== 'all' && ` · ${t('dash.insights.offerLabel', { defaultValue: 'offer' })} "${offerFilter.length > 30 ? offerFilter.slice(0, 28) + '…' : offerFilter}"`}.
           </p>
         </div>
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-2">
           <FilterDropdown
             icon={<MapPin className="w-3.5 h-3.5" />}
-            label="Location"
+            label={t('dash.insights.filterLocation', { defaultValue: 'Location' })}
             value={locFilter}
             onChange={setLocFilter}
             options={[
-              { value: 'all', label: 'All locations' },
+              { value: 'all', label: t('dash.insights.allLocationsOpt', { defaultValue: 'All locations' }) },
               ...locations.filter((l) => !l.archived).map((l) => ({ value: l.id, label: l.name })),
             ]}
           />
           <FilterDropdown
             icon={<Sparkles className="w-3.5 h-3.5" />}
-            label="Offer"
+            label={t('dash.insights.filterOffer', { defaultValue: 'Offer' })}
             value={offerFilter}
             onChange={setOfferFilter}
             options={[
-              { value: 'all', label: uniqueOffers.length > 0 ? `All offers (${uniqueOffers.length})` : 'All offers' },
+              { value: 'all', label: uniqueOffers.length > 0 ? t('dash.insights.allOffersCount', { count: uniqueOffers.length, defaultValue: 'All offers ({{count}})' }) : t('dash.insights.allOffers', { defaultValue: 'All offers' }) },
               ...uniqueOffers.map(({ offer, startedAt }) => ({
                 value: offer,
                 // Show offer text + the date it first started so the
                 // merchant can identify old campaigns at a glance.
-                label: `${offer.length > 28 ? offer.slice(0, 26) + '…' : offer} · since ${startedAt.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`,
+                label: `${offer.length > 28 ? offer.slice(0, 26) + '…' : offer} · ${t('dash.insights.since', { defaultValue: 'since' })} ${startedAt.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`,
               })),
             ]}
           />
@@ -259,13 +261,13 @@ export function InsightsPanel({ campaign, cards, activities, locations }: Insigh
         <div className="flex flex-wrap gap-2 items-center">
           <Calendar className="w-4 h-4 text-gray-400 mr-1" />
           {([
-            ['today', 'Today'],
-            ['yesterday', 'Yesterday'],
-            ['7d', 'Last 7 days'],
-            ['30d', 'Last 30 days'],
-            ['this_month', 'This month'],
-            ['last_month', 'Last month'],
-            ['custom', 'Custom'],
+            ['today', t('dash.insights.rToday', { defaultValue: 'Today' })],
+            ['yesterday', t('dash.insights.rYesterday', { defaultValue: 'Yesterday' })],
+            ['7d', t('dash.insights.r7d', { defaultValue: 'Last 7 days' })],
+            ['30d', t('dash.insights.r30d', { defaultValue: 'Last 30 days' })],
+            ['this_month', t('dash.insights.rThisMonth', { defaultValue: 'This month' })],
+            ['last_month', t('dash.insights.rLastMonth', { defaultValue: 'Last month' })],
+            ['custom', t('dash.insights.rCustom', { defaultValue: 'Custom' })],
           ] as const).map(([id, lbl]) => (
             <button
               key={id}
@@ -280,14 +282,14 @@ export function InsightsPanel({ campaign, cards, activities, locations }: Insigh
         </div>
         {range === 'custom' && (
           <div className="flex items-center gap-2 text-sm pt-2 border-t notion-border flex-wrap">
-            <label className="text-xs text-gray-500">From:</label>
+            <label className="text-xs text-gray-500">{t('dash.insights.from', { defaultValue: 'From:' })}</label>
             <input type="date" value={customFrom} onChange={(e) => setCustomFrom(e.target.value)} max={customTo || undefined} className="bg-[#F7F7F5] border notion-border rounded px-2 py-1 text-xs" />
-            <label className="text-xs text-gray-500 ml-2">To:</label>
+            <label className="text-xs text-gray-500 ml-2">{t('dash.insights.to', { defaultValue: 'To:' })}</label>
             <input type="date" value={customTo} onChange={(e) => setCustomTo(e.target.value)} min={customFrom || undefined} className="bg-[#F7F7F5] border notion-border rounded px-2 py-1 text-xs" />
           </div>
         )}
         <div className="text-[11px] text-gray-400">
-          Showing data from <strong className="text-[#37352F]">{from.toLocaleDateString()}</strong> to <strong className="text-[#37352F]">{to.toLocaleDateString()}</strong>
+          {t('dash.insights.showingFrom', { defaultValue: 'Showing data from' })} <strong className="text-[#37352F]">{from.toLocaleDateString()}</strong> {t('dash.insights.showingTo', { defaultValue: 'to' })} <strong className="text-[#37352F]">{to.toLocaleDateString()}</strong>
         </div>
       </div>
 
@@ -295,10 +297,10 @@ export function InsightsPanel({ campaign, cards, activities, locations }: Insigh
       <div className="bg-[#F7F7F5] border notion-border rounded-lg p-4 flex items-center gap-3">
         <div className="text-2xl">{campaign.customIcon || '🏷️'}</div>
         <div className="flex-1 min-w-0">
-          <div className="text-xs uppercase tracking-widest text-gray-400 font-bold mb-0.5">Current offer</div>
+          <div className="text-xs uppercase tracking-widest text-gray-400 font-bold mb-0.5">{t('dash.insights.currentOffer', { defaultValue: 'Current offer' })}</div>
           <div className="font-semibold truncate">{campaign.offerTitle}</div>
           <div className="text-xs text-gray-500 mt-0.5">
-            {campaign.maxStamps} stamps required &middot; {locations.filter((l) => !l.archived).length} active location{locations.filter((l) => !l.archived).length === 1 ? '' : 's'}
+            {campaign.maxStamps} {t('dash.insights.stampsRequired', { defaultValue: 'stamps required' })} · {locations.filter((l) => !l.archived).length} {locations.filter((l) => !l.archived).length === 1 ? t('dash.insights.activeLocationOne', { defaultValue: 'active location' }) : t('dash.insights.activeLocationOther', { defaultValue: 'active locations' })}
           </div>
         </div>
       </div>
@@ -306,28 +308,28 @@ export function InsightsPanel({ campaign, cards, activities, locations }: Insigh
       {/* Headline metric cards with trend deltas */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <TrendMetric
-          label="New members"
+          label={t('dash.insights.newMembers', { defaultValue: 'New members' })}
           value={joins}
           previousValue={joinsPrev}
           icon={<Users className="w-4 h-4" />}
           color="text-blue-600 bg-blue-50"
         />
         <TrendMetric
-          label="Stamps given"
+          label={t('dash.insights.stampsGiven', { defaultValue: 'Stamps given' })}
           value={stamps}
           previousValue={stampsPrev}
           icon={<TrendingUp className="w-4 h-4" />}
           color="text-orange-600 bg-orange-50"
         />
         <TrendMetric
-          label="Rewards claimed"
+          label={t('dash.insights.rewardsClaimed', { defaultValue: 'Rewards claimed' })}
           value={redeems}
           previousValue={redeemsPrev}
           icon={<Award className="w-4 h-4" />}
           color="text-green-600 bg-green-50"
         />
         <TrendMetric
-          label="Total members"
+          label={t('dash.insights.totalMembers', { defaultValue: 'Total members' })}
           value={totalCount}
           icon={<Users className="w-4 h-4" />}
           color="text-purple-600 bg-purple-50"
@@ -337,12 +339,12 @@ export function InsightsPanel({ campaign, cards, activities, locations }: Insigh
       {/* Activity trend chart */}
       <div className="bg-white border notion-border rounded-lg p-6">
         <div className="flex items-center justify-between mb-1">
-          <h3 className="font-semibold text-lg">Activity trend</h3>
+          <h3 className="font-semibold text-lg">{t('dash.insights.activityTrend', { defaultValue: 'Activity trend' })}</h3>
           <span className="text-xs text-gray-400">
-            {dailySeries.reduce((a, b) => a + b.count, 0)} events in this period
+            {dailySeries.reduce((a, b) => a + b.count, 0)} {t('dash.insights.eventsInPeriod', { defaultValue: 'events in this period' })}
           </span>
         </div>
-        <p className="text-xs text-gray-500 mb-5">All loyalty actions per day (joins, stamps, redemptions).</p>
+        <p className="text-xs text-gray-500 mb-5">{t('dash.insights.allActionsPerDay', { defaultValue: 'All loyalty actions per day (joins, stamps, redemptions).' })}</p>
         <DailyTrendChart series={dailySeries} />
       </div>
 
@@ -350,8 +352,8 @@ export function InsightsPanel({ campaign, cards, activities, locations }: Insigh
       <div className="grid md:grid-cols-2 gap-6">
         <div className="bg-white border notion-border rounded-lg p-6 space-y-4">
           <div>
-            <h3 className="font-semibold text-lg">Customer engagement</h3>
-            <p className="text-xs text-gray-500">Active customers vs those who haven't visited.</p>
+            <h3 className="font-semibold text-lg">{t('dash.insights.engagement', { defaultValue: 'Customer engagement' })}</h3>
+            <p className="text-xs text-gray-500">{t('dash.insights.engagementSub', { defaultValue: "Active customers vs those who haven't visited." })}</p>
           </div>
           <EngagementBar
             activeCount={activeCount}
@@ -360,11 +362,11 @@ export function InsightsPanel({ campaign, cards, activities, locations }: Insigh
           />
           <div className="pt-3 border-t notion-border">
             <div className="flex justify-between items-center text-sm">
-              <div className="text-gray-500">Completion rate</div>
+              <div className="text-gray-500">{t('dash.insights.completionRate', { defaultValue: 'Completion rate' })}</div>
               <div className="font-semibold">{completionRate.toFixed(1)}%</div>
             </div>
             <p className="text-xs text-gray-400 mt-1">
-              Rewards earned per member ({totalRewardsClaimed} total).
+              {t('dash.insights.rewardsPerMember', { defaultValue: 'Rewards earned per member' })} ({totalRewardsClaimed} {t('dash.insights.total', { defaultValue: 'total' })}).
             </p>
           </div>
         </div>
@@ -372,9 +374,9 @@ export function InsightsPanel({ campaign, cards, activities, locations }: Insigh
         <div className="bg-white border notion-border rounded-lg p-6">
           <div className="mb-4">
             <h3 className="font-semibold text-lg flex items-center gap-2">
-              <Clock className="w-4 h-4 text-gray-500" /> Busy days
+              <Clock className="w-4 h-4 text-gray-500" /> {t('dash.insights.busyDays', { defaultValue: 'Busy days' })}
             </h3>
-            <p className="text-xs text-gray-500">When customers earn stamps. Useful for staffing.</p>
+            <p className="text-xs text-gray-500">{t('dash.insights.busyDaysSub', { defaultValue: 'When customers earn stamps. Useful for staffing.' })}</p>
           </div>
           <DayOfWeekChart counts={dayOfWeek} />
         </div>
@@ -385,9 +387,9 @@ export function InsightsPanel({ campaign, cards, activities, locations }: Insigh
         <div className="bg-white border notion-border rounded-lg p-6">
           <div className="mb-4">
             <h3 className="font-semibold text-lg flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-gray-500" /> Activity by location
+              <MapPin className="w-4 h-4 text-gray-500" /> {t('dash.insights.byLocation', { defaultValue: 'Activity by location' })}
             </h3>
-            <p className="text-xs text-gray-500">Compare how each branch is performing.</p>
+            <p className="text-xs text-gray-500">{t('dash.insights.byLocationSub', { defaultValue: 'Compare how each branch is performing.' })}</p>
           </div>
           <LocationBreakdown rows={byLocation} />
         </div>
@@ -396,11 +398,11 @@ export function InsightsPanel({ campaign, cards, activities, locations }: Insigh
       {/* Recent activity feed (compact, last 5) */}
       <div className="bg-white border notion-border rounded-lg p-6">
         <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
-          <ActivityIcon className="w-4 h-4 text-gray-500" /> Recent activity
+          <ActivityIcon className="w-4 h-4 text-gray-500" /> {t('dash.insights.recentActivity', { defaultValue: 'Recent activity' })}
         </h3>
         {filtered.length === 0 ? (
           <div className="text-sm text-gray-400 text-center py-6">
-            No activity in this period.
+            {t('dash.insights.noActivity', { defaultValue: 'No activity in this period.' })}
           </div>
         ) : (
           <div className="space-y-1">
@@ -524,31 +526,33 @@ function DailyTrendChart({ series }: { series: Array<{ date: Date; count: number
 }
 
 function EngagementBar({ activeCount, dormantCount, activeRate }: { activeCount: number; dormantCount: number; activeRate: number }) {
+  const { t } = useTranslation();
   const total = activeCount + dormantCount;
   return (
     <div className="space-y-3">
       <div className="flex items-baseline justify-between">
         <div>
           <div className="text-3xl font-bold">{activeRate.toFixed(0)}%</div>
-          <div className="text-xs text-gray-500">members active in period</div>
+          <div className="text-xs text-gray-500">{t('dash.insights.membersActive', { defaultValue: 'members active in period' })}</div>
         </div>
         <div className="text-xs text-gray-400 text-right">
-          {activeCount.toLocaleString()} of {total.toLocaleString()}
+          {activeCount.toLocaleString()} {t('dash.insights.of', { defaultValue: 'of' })} {total.toLocaleString()}
         </div>
       </div>
       <div className="h-3 bg-[#F7F7F5] rounded-full overflow-hidden flex">
         <div className="bg-green-500" style={{ width: `${activeRate}%` }} />
       </div>
       <div className="flex justify-between text-xs text-gray-500">
-        <span>🟢 {activeCount.toLocaleString()} active</span>
-        <span>⚪ {dormantCount.toLocaleString()} dormant</span>
+        <span>🟢 {activeCount.toLocaleString()} {t('dash.insights.activeWord', { defaultValue: 'active' })}</span>
+        <span>⚪ {dormantCount.toLocaleString()} {t('dash.insights.dormantWord', { defaultValue: 'dormant' })}</span>
       </div>
     </div>
   );
 }
 
 function DayOfWeekChart({ counts }: { counts: number[] }) {
-  const labels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const { t } = useTranslation();
+  const labels = [t('dash.insights.dowSun', { defaultValue: 'Sun' }), t('dash.insights.dowMon', { defaultValue: 'Mon' }), t('dash.insights.dowTue', { defaultValue: 'Tue' }), t('dash.insights.dowWed', { defaultValue: 'Wed' }), t('dash.insights.dowThu', { defaultValue: 'Thu' }), t('dash.insights.dowFri', { defaultValue: 'Fri' }), t('dash.insights.dowSat', { defaultValue: 'Sat' })];
   const max = Math.max(1, ...counts);
   return (
     <div className="flex items-end gap-3 h-32">
@@ -573,9 +577,10 @@ function DayOfWeekChart({ counts }: { counts: number[] }) {
 }
 
 function LocationBreakdown({ rows }: { rows: Array<{ id: string | null; name: string; joins: number; stamps: number; redeems: number; total: number }> }) {
+  const { t } = useTranslation();
   const maxTotal = Math.max(1, ...rows.map((r) => r.total));
   if (rows.length === 0) {
-    return <div className="text-sm text-gray-400 text-center py-4">No activity by location in this period.</div>;
+    return <div className="text-sm text-gray-400 text-center py-4">{t('dash.insights.noActivityByLoc', { defaultValue: 'No activity by location in this period.' })}</div>;
   }
   return (
     <div className="space-y-3">
@@ -584,13 +589,13 @@ function LocationBreakdown({ rows }: { rows: Array<{ id: string | null; name: st
           <div className="flex items-center justify-between text-sm">
             <span className="font-medium truncate flex-1 mr-2">{r.name}</span>
             <span className="text-gray-400 text-xs whitespace-nowrap">
-              {r.joins} joined · {r.stamps} stamps · {r.redeems} rewards
+              {r.joins} {t('dash.insights.joined', { defaultValue: 'joined' })} · {r.stamps} {t('dash.insights.stampsWord', { defaultValue: 'stamps' })} · {r.redeems} {t('dash.insights.rewardsWord', { defaultValue: 'rewards' })}
             </span>
           </div>
           <div className="h-2 bg-[#F7F7F5] rounded-full overflow-hidden flex">
-            <div className="bg-blue-500" style={{ width: `${(r.joins / maxTotal) * 100}%` }} title={`${r.joins} joins`} />
-            <div className="bg-orange-500" style={{ width: `${(r.stamps / maxTotal) * 100}%` }} title={`${r.stamps} stamps`} />
-            <div className="bg-green-500" style={{ width: `${(r.redeems / maxTotal) * 100}%` }} title={`${r.redeems} redemptions`} />
+            <div className="bg-blue-500" style={{ width: `${(r.joins / maxTotal) * 100}%` }} title={`${r.joins} ${t('dash.insights.joinsWord', { defaultValue: 'joins' })}`} />
+            <div className="bg-orange-500" style={{ width: `${(r.stamps / maxTotal) * 100}%` }} title={`${r.stamps} ${t('dash.insights.stampsWord', { defaultValue: 'stamps' })}`} />
+            <div className="bg-green-500" style={{ width: `${(r.redeems / maxTotal) * 100}%` }} title={`${r.redeems} ${t('dash.insights.redemptionsWord', { defaultValue: 'redemptions' })}`} />
           </div>
         </div>
       ))}
@@ -599,6 +604,7 @@ function LocationBreakdown({ rows }: { rows: Array<{ id: string | null; name: st
 }
 
 function RecentRow({ activity, locations }: { activity: ActivityItem; locations: Location[] }) {
+  const { t } = useTranslation();
   const time = new Date(activity.timestamp);
   const ago = timeAgo(time);
   const locName = activity.locationId
@@ -610,9 +616,9 @@ function RecentRow({ activity, locations }: { activity: ActivityItem; locations:
     REDEEM: 'bg-green-50 text-green-700',
   };
   const labels: Record<string, string> = {
-    JOIN: 'Joined',
-    STAMP: 'Stamped',
-    REDEEM: 'Redeemed',
+    JOIN: t('dash.insights.evJoined', { defaultValue: 'Joined' }),
+    STAMP: t('dash.insights.evStamped', { defaultValue: 'Stamped' }),
+    REDEEM: t('dash.insights.evRedeemed', { defaultValue: 'Redeemed' }),
   };
   return (
     <div className="flex items-center gap-3 py-2 border-b notion-border last:border-b-0">
@@ -620,7 +626,7 @@ function RecentRow({ activity, locations }: { activity: ActivityItem; locations:
         {labels[activity.type]}
       </span>
       <span className="text-sm flex-1 truncate">{activity.customerName || '—'}</span>
-      {locName && <span className="text-xs text-gray-400 hidden sm:inline">at {locName}</span>}
+      {locName && <span className="text-xs text-gray-400 hidden sm:inline">{t('dash.insights.atWord', { defaultValue: 'at' })} {locName}</span>}
       <span className="text-xs text-gray-400 whitespace-nowrap">{ago}</span>
     </div>
   );

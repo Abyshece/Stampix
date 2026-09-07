@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Mail, Lock, Loader2, Check } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 type Msg = { ok: boolean; text: string } | null;
 
@@ -10,6 +11,7 @@ type Msg = { ok: boolean; text: string } | null;
  * session; the email change is confirmed via a link Supabase emails out.
  */
 export function AccountSecurity({ currentEmail }: { currentEmail: string }) {
+  const { t } = useTranslation();
   const [newEmail, setNewEmail] = useState('');
   const [emailBusy, setEmailBusy] = useState(false);
   const [emailMsg, setEmailMsg] = useState<Msg>(null);
@@ -23,11 +25,11 @@ export function AccountSecurity({ currentEmail }: { currentEmail: string }) {
     setEmailMsg(null);
     const email = newEmail.trim();
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-      setEmailMsg({ ok: false, text: 'Please enter a valid email address.' });
+      setEmailMsg({ ok: false, text: t('dash.security.validEmail', { defaultValue: 'Please enter a valid email address.' }) });
       return;
     }
     if (email.toLowerCase() === currentEmail.toLowerCase()) {
-      setEmailMsg({ ok: false, text: "That's already your email." });
+      setEmailMsg({ ok: false, text: t('dash.security.alreadyEmail', { defaultValue: "That's already your email." }) });
       return;
     }
     setEmailBusy(true);
@@ -36,11 +38,11 @@ export function AccountSecurity({ currentEmail }: { currentEmail: string }) {
       if (error) throw error;
       setEmailMsg({
         ok: true,
-        text: `Almost done — we've emailed a confirmation link to ${email} (and to your current address). Click it to finish switching. You stay signed in with ${currentEmail} until then.`,
+        text: t('dash.security.emailSent', { email, current: currentEmail, defaultValue: "Almost done — we've emailed a confirmation link to {{email}} (and to your current address). Click it to finish switching. You stay signed in with {{current}} until then." }),
       });
       setNewEmail('');
     } catch (err) {
-      setEmailMsg({ ok: false, text: err instanceof Error ? err.message : 'Could not update your email.' });
+      setEmailMsg({ ok: false, text: err instanceof Error ? err.message : t('dash.security.errEmail', { defaultValue: 'Could not update your email.' }) });
     } finally {
       setEmailBusy(false);
     }
@@ -49,22 +51,22 @@ export function AccountSecurity({ currentEmail }: { currentEmail: string }) {
   const changePassword = async () => {
     setPwMsg(null);
     if (pw.length < 8) {
-      setPwMsg({ ok: false, text: 'Password must be at least 8 characters.' });
+      setPwMsg({ ok: false, text: t('dash.security.pwMin', { defaultValue: 'Password must be at least 8 characters.' }) });
       return;
     }
     if (pw !== pw2) {
-      setPwMsg({ ok: false, text: 'The two passwords do not match.' });
+      setPwMsg({ ok: false, text: t('dash.security.pwMismatch', { defaultValue: 'The two passwords do not match.' }) });
       return;
     }
     setPwBusy(true);
     try {
       const { error } = await supabase.auth.updateUser({ password: pw });
       if (error) throw error;
-      setPwMsg({ ok: true, text: 'Password updated. Use it next time you sign in.' });
+      setPwMsg({ ok: true, text: t('dash.security.pwUpdated', { defaultValue: 'Password updated. Use it next time you sign in.' }) });
       setPw('');
       setPw2('');
     } catch (err) {
-      setPwMsg({ ok: false, text: err instanceof Error ? err.message : 'Could not update your password.' });
+      setPwMsg({ ok: false, text: err instanceof Error ? err.message : t('dash.security.errPw', { defaultValue: 'Could not update your password.' }) });
     } finally {
       setPwBusy(false);
     }
@@ -80,33 +82,33 @@ export function AccountSecurity({ currentEmail }: { currentEmail: string }) {
       {/* Email */}
       <div className="space-y-3">
         <div>
-          <h3 className="font-medium flex items-center gap-2"><Mail className="w-4 h-4" /> Email address</h3>
+          <h3 className="font-medium flex items-center gap-2"><Mail className="w-4 h-4" /> {t('dash.security.emailAddress', { defaultValue: 'Email address' })}</h3>
           <p className="text-xs text-gray-400 mt-1">
-            You're signed in as <span className="font-medium text-gray-600">{currentEmail || '—'}</span>.
+            {t('dash.security.signedInAs', { defaultValue: "You're signed in as" })} <span className="font-medium text-gray-600">{currentEmail || '—'}</span>.
           </p>
         </div>
         <input
           type="email"
           value={newEmail}
           onChange={(e) => setNewEmail(e.target.value)}
-          placeholder="new@email.com"
+          placeholder={t('dash.security.newEmailPh', { defaultValue: 'new@email.com' })}
           autoComplete="email"
           className={inputCls}
         />
         {emailMsg && <p className={`text-xs ${emailMsg.ok ? 'text-green-600' : 'text-red-600'}`}>{emailMsg.text}</p>}
         <button onClick={changeEmail} disabled={emailBusy || !newEmail.trim()} className={btnCls}>
-          {emailBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />} Update email
+          {emailBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />} {t('dash.security.updateEmail', { defaultValue: 'Update email' })}
         </button>
       </div>
 
       {/* Password */}
       <div className="space-y-3 pt-6 border-t notion-border">
-        <h3 className="font-medium flex items-center gap-2"><Lock className="w-4 h-4" /> Password</h3>
+        <h3 className="font-medium flex items-center gap-2"><Lock className="w-4 h-4" /> {t('dash.security.password', { defaultValue: 'Password' })}</h3>
         <input
           type="password"
           value={pw}
           onChange={(e) => setPw(e.target.value)}
-          placeholder="New password (at least 8 characters)"
+          placeholder={t('dash.security.newPwPh', { defaultValue: 'New password (at least 8 characters)' })}
           autoComplete="new-password"
           className={inputCls}
         />
@@ -114,13 +116,13 @@ export function AccountSecurity({ currentEmail }: { currentEmail: string }) {
           type="password"
           value={pw2}
           onChange={(e) => setPw2(e.target.value)}
-          placeholder="Confirm new password"
+          placeholder={t('dash.security.confirmPwPh', { defaultValue: 'Confirm new password' })}
           autoComplete="new-password"
           className={inputCls}
         />
         {pwMsg && <p className={`text-xs ${pwMsg.ok ? 'text-green-600' : 'text-red-600'}`}>{pwMsg.text}</p>}
         <button onClick={changePassword} disabled={pwBusy || !pw || !pw2} className={btnCls}>
-          {pwBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />} Update password
+          {pwBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />} {t('dash.security.updatePw', { defaultValue: 'Update password' })}
         </button>
       </div>
     </div>

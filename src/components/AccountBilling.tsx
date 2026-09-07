@@ -5,6 +5,7 @@ import type { MerchantBilling, UserCard } from '../types';
 import { FREE_TIER_CARD_LIMIT } from '../types';
 import { UpgradeModal } from './UpgradeModal';
 import { openBillingPortal } from '../services/billing';
+import { useTranslation } from 'react-i18next';
 
 import { proPrice } from '../lib/pricing';
 
@@ -21,6 +22,7 @@ interface AccountBillingProps {
  * (cancel, update payment method, view invoices).
  */
 export function AccountBilling({ billing, country, cards }: AccountBillingProps) {
+  const { t } = useTranslation();
   const [showModal, setShowModal] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
   const [portalError, setPortalError] = useState<string | null>(null);
@@ -33,7 +35,7 @@ export function AccountBilling({ billing, country, cards }: AccountBillingProps)
       // openBillingPortal does window.location.href = ..., so this
       // function never returns in the success case.
     } catch (e) {
-      setPortalError(e instanceof Error ? e.message : 'Could not open billing portal');
+      setPortalError(e instanceof Error ? e.message : t('dash.billing.errPortal', { defaultValue: 'Could not open billing portal' }));
     } finally {
       setPortalLoading(false);
     }
@@ -48,9 +50,9 @@ export function AccountBilling({ billing, country, cards }: AccountBillingProps)
     <div className="bg-white rounded-lg border notion-border p-6 space-y-5">
       <div>
         <h3 className="text-lg font-semibold flex items-center gap-2">
-          <CreditCard className="w-5 h-5 text-gray-500" /> Account & Billing
+          <CreditCard className="w-5 h-5 text-gray-500" /> {t('dash.billing.title', { defaultValue: 'Account & Billing' })}
         </h3>
-        <p className="text-sm text-gray-500 mt-1">Your current plan and usage.</p>
+        <p className="text-sm text-gray-500 mt-1">{t('dash.billing.sub', { defaultValue: 'Your current plan and usage.' })}</p>
       </div>
 
       {/* Plan card */}
@@ -61,17 +63,17 @@ export function AccountBilling({ billing, country, cards }: AccountBillingProps)
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Current Plan</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-gray-400">{t('dash.billing.currentPlan', { defaultValue: 'Current Plan' })}</span>
             </div>
             <div className="flex items-baseline gap-2">
               <span className="text-2xl font-serif-display font-semibold">
-                {isPro ? 'Pro' : 'Free'}
+                {isPro ? t('dash.billing.pro', { defaultValue: 'Pro' }) : t('dash.billing.free', { defaultValue: 'Free' })}
               </span>
               {isPro && <Sparkles className="w-4 h-4 text-amber-500" />}
             </div>
             {isPro && billing.planStartedAt && (
               <p className="text-xs text-gray-500 mt-1">
-                Active since {billing.planStartedAt.toLocaleDateString()}
+                {t('dash.billing.activeSince', { date: billing.planStartedAt.toLocaleDateString(), defaultValue: 'Active since {{date}}' })}
               </p>
             )}
           </div>
@@ -80,7 +82,7 @@ export function AccountBilling({ billing, country, cards }: AccountBillingProps)
               onClick={() => setShowModal(true)}
               className="bg-[#37352F] text-white px-4 py-2 rounded-md font-medium text-sm hover:bg-opacity-90 transition"
             >
-              Upgrade
+              {t('dash.billing.upgrade', { defaultValue: 'Upgrade' })}
             </button>
           )}
           {isPro && (
@@ -90,7 +92,7 @@ export function AccountBilling({ billing, country, cards }: AccountBillingProps)
               className="bg-white border notion-border text-[#37352F] px-4 py-2 rounded-md font-medium text-sm hover:bg-[#F7F7F5] transition flex items-center gap-2 disabled:opacity-50"
             >
               {portalLoading ? <Loader2 className="w-4 h-4 animate-spin" />
-                : <><ExternalLink className="w-3.5 h-3.5" /> Manage</>}
+                : <><ExternalLink className="w-3.5 h-3.5" /> {t('dash.billing.manage', { defaultValue: 'Manage' })}</>}
             </button>
           )}
         </div>
@@ -105,9 +107,9 @@ export function AccountBilling({ billing, country, cards }: AccountBillingProps)
       {!isPro && (
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="font-medium">Customer cards</span>
+            <span className="font-medium">{t('dash.billing.customerCards', { defaultValue: 'Customer cards' })}</span>
             <span className="text-gray-500">
-              <strong className="text-[#37352F]">{used}</strong> of {FREE_TIER_CARD_LIMIT}
+              <strong className="text-[#37352F]">{used}</strong> {t('dash.billing.of', { defaultValue: 'of' })} {FREE_TIER_CARD_LIMIT}
             </span>
           </div>
           <div className="h-2 bg-[#F7F7F5] rounded-full overflow-hidden">
@@ -122,8 +124,8 @@ export function AccountBilling({ billing, country, cards }: AccountBillingProps)
           </div>
           <p className="text-xs text-gray-500">
             {used >= FREE_TIER_CARD_LIMIT
-              ? 'You\'ve hit the free-tier cap. New customer signups are blocked until you upgrade. Existing customers can still earn stamps.'
-              : `${FREE_TIER_CARD_LIMIT - used} customer slot${FREE_TIER_CARD_LIMIT - used === 1 ? '' : 's'} left. Upgrade for unlimited.`}
+              ? t('dash.billing.capHit', { defaultValue: "You've hit the free-tier cap. New customer signups are blocked until you upgrade. Existing customers can still earn stamps." })
+              : t(`dash.billing.slotsLeft${FREE_TIER_CARD_LIMIT - used === 1 ? 'One' : 'Other'}`, { count: FREE_TIER_CARD_LIMIT - used, defaultValue: FREE_TIER_CARD_LIMIT - used === 1 ? '{{count}} customer slot left. Upgrade for unlimited.' : '{{count}} customer slots left. Upgrade for unlimited.' })}
           </p>
         </div>
       )}
@@ -131,11 +133,11 @@ export function AccountBilling({ billing, country, cards }: AccountBillingProps)
       {/* What's included */}
       {!isPro && (
         <div className="bg-[#F7F7F5] border notion-border rounded-md p-4 space-y-2.5">
-          <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Pro features — {price}</p>
-          {PRO_FEATURES.map((feat) => (
+          <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">{t('dash.billing.proFeatures', { defaultValue: 'Pro features' })} — {price}</p>
+          {PRO_FEATURES.map((feat, i) => (
             <div key={feat} className="flex items-center gap-2 text-sm">
               <Check className="w-3.5 h-3.5 text-green-600 flex-shrink-0" strokeWidth={3} />
-              <span>{feat}</span>
+              <span>{t(`dash.billing.feat${i}`, { defaultValue: feat })}</span>
             </div>
           ))}
         </div>

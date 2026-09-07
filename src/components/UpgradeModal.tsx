@@ -4,6 +4,7 @@ import { loadStripe, type Stripe } from '@stripe/stripe-js';
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from '@stripe/react-stripe-js';
 import { X, Check, Sparkles, Loader2 } from 'lucide-react';
 import { createCheckoutSession } from '../services/billing';
+import { useTranslation } from 'react-i18next';
 
 import { proPrice } from '../lib/pricing';
 
@@ -40,6 +41,7 @@ function getStripe(): Promise<Stripe | null> {
  * modal isn't broken.
  */
 export function UpgradeModal({ country, onClose }: UpgradeModalProps) {
+  const { t } = useTranslation();
   const [view, setView] = useState<'pricing' | 'checkout'>('pricing');
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -59,7 +61,7 @@ export function UpgradeModal({ country, onClose }: UpgradeModalProps) {
       setClientSecret(secret);
       setView('checkout');
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not start checkout');
+      setError(e instanceof Error ? e.message : t('dash.upgrade.errCheckout', { defaultValue: 'Could not start checkout' }));
     } finally {
       setLoading(false);
     }
@@ -87,7 +89,7 @@ export function UpgradeModal({ country, onClose }: UpgradeModalProps) {
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-[#37352F] transition p-1 z-20"
-          aria-label="Close"
+          aria-label={t('dash.upgrade.close', { defaultValue: 'Close' })}
         >
           <X className="w-5 h-5" />
         </button>
@@ -121,6 +123,7 @@ function PricingView({
   stripeAvailable: boolean;
   onUpgrade: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="overflow-y-auto">
       <div className="bg-gradient-to-br from-[#37352F] to-[#1a1918] text-white px-8 pt-10 pb-12 text-center">
@@ -128,31 +131,31 @@ function PricingView({
           <Sparkles className="w-6 h-6 text-amber-300" />
         </div>
         <h2 id="upgrade-title" className="text-2xl font-serif-display font-semibold mb-1">
-          Upgrade to Pro
+          {t('dash.upgrade.title', { defaultValue: 'Upgrade to Pro' })}
         </h2>
-        <p className="text-sm text-gray-300">Unlimited customers, no limits.</p>
+        <p className="text-sm text-gray-300">{t('dash.upgrade.subtitle', { defaultValue: 'Unlimited customers, no limits.' })}</p>
       </div>
 
       <div className="px-8 -mt-6">
         <div className="bg-white border notion-border rounded-xl p-5 shadow-md text-center">
           <div className="flex items-baseline justify-center gap-1">
             <span className="text-4xl font-bold">{price}</span>
-            <span className="text-gray-500 text-sm">/month</span>
+            <span className="text-gray-500 text-sm">{t('pricing.month', { defaultValue: '/month' })}</span>
           </div>
           <p className="text-xs text-gray-400 mt-1">{currencyNote}</p>
         </div>
       </div>
 
       <div className="px-8 py-8 space-y-3">
-        {PRO_FEATURES.slice(0, 8).map((feature) => (
+        {PRO_FEATURES.slice(0, 8).map((feature, i) => (
           <div key={feature} className="flex items-start gap-2.5">
             <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
               <Check className="w-3 h-3 text-green-600" strokeWidth={3} />
             </div>
-            <span className="text-sm text-[#37352F]">{feature}</span>
+            <span className="text-sm text-[#37352F]">{t(`dash.billing.feat${i}`, { defaultValue: feature })}</span>
           </div>
         ))}
-        <p className="text-xs text-gray-400 m-0 pl-[30px]">and {PRO_FEATURES.length - 8} more — see the full list in Settings → Billing.</p>
+        <p className="text-xs text-gray-400 m-0 pl-[30px]">{t('dash.upgrade.andMore', { count: PRO_FEATURES.length - 8, defaultValue: 'and {{count}} more — see the full list in Settings → Billing.' })}</p>
       </div>
 
       <div className="px-8 pb-8 space-y-3">
@@ -163,9 +166,9 @@ function PricingView({
         )}
         {!stripeAvailable ? (
           <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 text-sm text-blue-800 text-center">
-            <p className="font-semibold mb-1">Almost ready!</p>
+            <p className="font-semibold mb-1">{t('dash.upgrade.almostReady', { defaultValue: 'Almost ready!' })}</p>
             <p>
-              Drop us a line at <strong>hello@stampfix.app</strong> and we'll personally set you up with the Pro plan today.
+              {t('dash.upgrade.dropLineA', { defaultValue: 'Drop us a line at' })} <strong>hello@stampfix.app</strong> {t('dash.upgrade.dropLineB', { defaultValue: "and we'll personally set you up with the Pro plan today." })}
             </p>
           </div>
         ) : (
@@ -177,12 +180,12 @@ function PricingView({
             {loading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              <>Upgrade now — {price}/mo <Sparkles className="w-4 h-4" /></>
+              <>{t('dash.upgrade.upgradeNowPrice', { price, defaultValue: 'Upgrade now — {{price}}/mo' })} <Sparkles className="w-4 h-4" /></>
             )}
           </button>
         )}
         <p className="text-[11px] text-center text-gray-400">
-          Secure payment via Stripe. Cancel anytime from Settings.
+          {t('dash.upgrade.securePayment', { defaultValue: 'Secure payment via Stripe. Cancel anytime from Settings.' })}
         </p>
       </div>
     </div>
@@ -192,6 +195,7 @@ function PricingView({
 function CheckoutView({
   clientSecret, onBack,
 }: { clientSecret: string; onBack: () => void }) {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col overflow-hidden">
       <div className="px-6 py-4 border-b notion-border flex items-center justify-between bg-white sticky top-0 z-10">
@@ -199,9 +203,9 @@ function CheckoutView({
           onClick={onBack}
           className="text-sm text-gray-500 hover:text-[#37352F] transition"
         >
-          ← Back to plans
+          ← {t('dash.upgrade.backToPlans', { defaultValue: 'Back to plans' })}
         </button>
-        <h3 className="font-semibold">Complete your upgrade</h3>
+        <h3 className="font-semibold">{t('dash.upgrade.complete', { defaultValue: 'Complete your upgrade' })}</h3>
         <div className="w-12" />
       </div>
       <div className="overflow-y-auto">

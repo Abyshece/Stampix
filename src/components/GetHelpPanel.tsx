@@ -3,6 +3,7 @@ import { LifeBuoy, Loader2, Check, AlertCircle, MessageSquare } from 'lucide-rea
 import { useAuth } from '../lib/auth';
 import { supabase } from '../lib/supabase';
 import { submitTicket } from '../services/admin';
+import { useTranslation } from 'react-i18next';
 
 type Category = 'bug' | 'billing' | 'feature_request' | 'abuse' | 'other';
 
@@ -30,6 +31,7 @@ interface MyTicketRow {
  */
 export function GetHelpPanel() {
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   // ----- New ticket form state -----
   const [category, setCategory] = useState<Category>('bug');
@@ -90,7 +92,7 @@ export function GetHelpPanel() {
       await loadHistory();
       setTimeout(() => setSubmittedAt(null), 5000);
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : 'Could not send. Try again.');
+      setSubmitError(err instanceof Error ? err.message : t('dash.help.errSend', { defaultValue: 'Could not send. Try again.' }));
     } finally {
       setSubmitting(false);
     }
@@ -100,35 +102,35 @@ export function GetHelpPanel() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <header>
         <h1 className="text-3xl md:text-4xl font-serif-display font-semibold mb-2 flex items-center gap-2">
-          <LifeBuoy className="w-7 h-7 text-gray-500" /> Get help
+          <LifeBuoy className="w-7 h-7 text-gray-500" /> {t('dash.help.title', { defaultValue: 'Get help' })}
         </h1>
         <p className="text-gray-500 text-sm md:text-base">
-          Have an issue, suggestion, or question? Send us a message — we usually reply within 1 business day.
+          {t('dash.help.sub', { defaultValue: 'Have an issue, suggestion, or question? Send us a message — we usually reply within 1 business day.' })}
         </p>
       </header>
 
       {/* ---------- New ticket form ---------- */}
       <div className="bg-white border notion-border rounded-lg p-6 space-y-4">
-        <h2 className="font-semibold">Send us a message</h2>
+        <h2 className="font-semibold">{t('dash.help.sendMessage', { defaultValue: 'Send us a message' })}</h2>
 
         {submittedAt && (
           <div className="bg-green-50 border border-green-200 rounded p-3 flex items-center gap-2 text-sm text-green-800">
             <Check className="w-4 h-4 flex-shrink-0" />
-            Got it. We'll get back to you by email at <strong className="ml-1">{user?.email}</strong>.
+            {t('dash.help.gotIt', { defaultValue: "Got it. We'll get back to you by email at" })} <strong className="ml-1">{user?.email}</strong>.
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Category */}
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-gray-600 block">What's this about?</label>
+            <label className="text-xs font-medium text-gray-600 block">{t('dash.help.aboutLabel', { defaultValue: "What's this about?" })}</label>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
               {([
-                ['bug', '🐛 Bug'],
-                ['billing', '💳 Billing'],
-                ['feature_request', '💡 Feature'],
-                ['abuse', '⚠️ Abuse'],
-                ['other', '💬 Other'],
+                ['bug', t('dash.help.catBug', { defaultValue: '🐛 Bug' })],
+                ['billing', t('dash.help.catBilling', { defaultValue: '💳 Billing' })],
+                ['feature_request', t('dash.help.catFeature', { defaultValue: '💡 Feature' })],
+                ['abuse', t('dash.help.catAbuse', { defaultValue: '⚠️ Abuse' })],
+                ['other', t('dash.help.catOther', { defaultValue: '💬 Other' })],
               ] as const).map(([val, label]) => (
                 <button
                   key={val}
@@ -148,12 +150,12 @@ export function GetHelpPanel() {
 
           {/* Subject */}
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-gray-600 block">Subject</label>
+            <label className="text-xs font-medium text-gray-600 block">{t('dash.help.subject', { defaultValue: 'Subject' })}</label>
             <input
               type="text"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              placeholder="e.g. Scanner not detecting QR codes"
+              placeholder={t('dash.help.subjectPh', { defaultValue: 'e.g. Scanner not detecting QR codes' })}
               maxLength={140}
               className="w-full bg-[#F7F7F5] border notion-border rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#37352F]/20"
             />
@@ -161,16 +163,16 @@ export function GetHelpPanel() {
 
           {/* Body */}
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-gray-600 block">Tell us what's going on</label>
+            <label className="text-xs font-medium text-gray-600 block">{t('dash.help.bodyLabel', { defaultValue: "Tell us what's going on" })}</label>
             <textarea
               value={body}
               onChange={(e) => setBody(e.target.value)}
               rows={6}
-              placeholder="Describe the issue, what you tried, and any error messages..."
+              placeholder={t('dash.help.bodyPh', { defaultValue: 'Describe the issue, what you tried, and any error messages...' })}
               className="w-full bg-[#F7F7F5] border notion-border rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#37352F]/20 resize-none"
             />
             <p className="text-[11px] text-gray-400">
-              Don't include passwords or payment details. Screenshots help — paste them in an email reply after submitting.
+              {t('dash.help.noSecrets', { defaultValue: "Don't include passwords or payment details. Screenshots help — paste them in an email reply after submitting." })}
             </p>
           </div>
 
@@ -187,7 +189,7 @@ export function GetHelpPanel() {
               className="bg-[#37352F] text-white px-5 py-2.5 rounded-md text-sm font-medium hover:bg-opacity-90 transition disabled:opacity-50 flex items-center gap-2"
             >
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageSquare className="w-4 h-4" />}
-              Send message
+              {t('dash.help.send', { defaultValue: 'Send message' })}
             </button>
           </div>
         </form>
@@ -196,7 +198,7 @@ export function GetHelpPanel() {
       {/* ---------- Past tickets ---------- */}
       <div className="bg-white border notion-border rounded-lg p-6 space-y-4">
         <h2 className="font-semibold flex items-center gap-2">
-          Your past messages
+          {t('dash.help.pastMessages', { defaultValue: 'Your past messages' })}
           <span className="text-xs text-gray-400 font-normal">({myTickets.length})</span>
         </h2>
 
@@ -204,7 +206,7 @@ export function GetHelpPanel() {
           <div className="flex items-center justify-center py-10"><Loader2 className="w-5 h-5 animate-spin text-gray-400" /></div>
         ) : myTickets.length === 0 ? (
           <div className="text-sm text-gray-400 text-center py-8">
-            You haven't sent us anything yet.
+            {t('dash.help.noneSent', { defaultValue: "You haven't sent us anything yet." })}
           </div>
         ) : (
           <div className="space-y-2">
@@ -219,6 +221,7 @@ export function GetHelpPanel() {
 }
 
 function TicketRow({ ticket }: { ticket: MyTicketRow }) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const statusColor: Record<string, string> = {
     open: 'bg-amber-100 text-amber-700',
@@ -235,28 +238,28 @@ function TicketRow({ ticket }: { ticket: MyTicketRow }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5 flex-wrap">
             <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded uppercase tracking-wider ${statusColor[ticket.status] ?? ''}`}>
-              {ticket.status.replace('_', ' ')}
+              {t(`dash.help.status.${ticket.status}`, { defaultValue: ticket.status.replace('_', ' ') })}
             </span>
             <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">
-              {ticket.category.replace('_', ' ')}
+              {t(`dash.help.cat.${ticket.category}`, { defaultValue: ticket.category.replace('_', ' ') })}
             </span>
             <span className="text-sm font-medium truncate">{ticket.subject}</span>
           </div>
           <div className="text-xs text-gray-500">
-            Sent {new Date(ticket.created_at).toLocaleString()}
-            {ticket.resolved_at && ` · Resolved ${new Date(ticket.resolved_at).toLocaleDateString()}`}
+            {t('dash.help.sent', { defaultValue: 'Sent' })} {new Date(ticket.created_at).toLocaleString()}
+            {ticket.resolved_at && ` · ${t('dash.help.resolved', { defaultValue: 'Resolved' })} ${new Date(ticket.resolved_at).toLocaleDateString()}`}
           </div>
         </div>
       </button>
       {expanded && ticket.admin_notes && (
         <div className="border-t notion-border px-3 py-2 bg-[#F7F7F5] text-xs">
-          <div className="font-medium text-gray-500 mb-1">Note from support:</div>
+          <div className="font-medium text-gray-500 mb-1">{t('dash.help.noteFromSupport', { defaultValue: 'Note from support:' })}</div>
           <div className="whitespace-pre-wrap text-gray-700">{ticket.admin_notes}</div>
         </div>
       )}
       {expanded && !ticket.admin_notes && (
         <div className="border-t notion-border px-3 py-2 bg-[#F7F7F5] text-xs text-gray-400 italic">
-          No reply yet. We'll respond by email at the address on your account.
+          {t('dash.help.noReply', { defaultValue: "No reply yet. We'll respond by email at the address on your account." })}
         </div>
       )}
     </div>

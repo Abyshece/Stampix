@@ -3,6 +3,7 @@ import { AlertTriangle, Loader2 } from 'lucide-react';
 import { signOut } from '../lib/auth';
 import { deleteMyAccount } from '../lib/db';
 import type { MerchantBilling } from '../types';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Settings → Danger Zone. Lets the merchant permanently delete their
@@ -26,6 +27,7 @@ export function DangerZonePanel({
   billing: MerchantBilling;
   onGoToBilling: () => void;
 }) {
+  const { t } = useTranslation();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [typedName, setTypedName] = useState('');
   const [deleting, setDeleting] = useState(false);
@@ -37,7 +39,7 @@ export function DangerZonePanel({
 
   const handleDelete = async () => {
     if (typedName !== businessName) {
-      setError(`Please type "${businessName}" exactly to confirm.`);
+      setError(t('dash.danger.typeToConfirm', { name: businessName, defaultValue: 'Please type "{{name}}" exactly to confirm.' }));
       return;
     }
     setDeleting(true);
@@ -46,7 +48,7 @@ export function DangerZonePanel({
       const result = await deleteMyAccount();
       if (!result.success) {
         // Backend blocked (e.g. subscription still active despite client check)
-        setError(result.message ?? 'Could not delete account.');
+        setError(result.message ?? t('dash.danger.couldNotDelete', { defaultValue: 'Could not delete account.' }));
         setDeleting(false);
         return;
       }
@@ -54,7 +56,7 @@ export function DangerZonePanel({
       await signOut();
       window.location.href = '/';
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not delete account.');
+      setError(e instanceof Error ? e.message : t('dash.danger.couldNotDelete', { defaultValue: 'Could not delete account.' }));
       setDeleting(false);
     }
   };
@@ -63,10 +65,10 @@ export function DangerZonePanel({
     <div className="bg-white rounded-lg border-2 border-red-200 p-6 space-y-4">
       <div>
         <h3 className="text-lg font-semibold flex items-center gap-2 text-red-700">
-          <AlertTriangle className="w-5 h-5" /> Danger zone
+          <AlertTriangle className="w-5 h-5" /> {t('dash.danger.title', { defaultValue: 'Danger zone' })}
         </h3>
         <p className="text-sm text-gray-500 mt-1">
-          Permanently delete your Stampfix account. This action is irreversible.
+          {t('dash.danger.sub', { defaultValue: 'Permanently delete your Stampfix account. This action is irreversible.' })}
         </p>
       </div>
 
@@ -74,17 +76,16 @@ export function DangerZonePanel({
         // Subscription block — must cancel first.
         <div className="bg-amber-50 border border-amber-200 rounded-md p-4">
           <p className="text-sm text-amber-900 font-medium mb-2">
-            You have an active Pro subscription.
+            {t('dash.danger.activeSubTitle', { defaultValue: 'You have an active Pro subscription.' })}
           </p>
           <p className="text-xs text-amber-700 mb-3">
-            Please cancel your subscription before deleting your account.
-            Otherwise you'll continue to be charged.
+            {t('dash.danger.activeSubBody', { defaultValue: "Please cancel your subscription before deleting your account. Otherwise you'll continue to be charged." })}
           </p>
           <button
             onClick={onGoToBilling}
             className="bg-white border border-amber-300 text-amber-900 text-xs font-medium px-3 py-1.5 rounded hover:bg-amber-100 transition"
           >
-            Go to billing settings
+            {t('dash.danger.goToBilling', { defaultValue: 'Go to billing settings' })}
           </button>
         </div>
       ) : !confirmOpen ? (
@@ -93,26 +94,26 @@ export function DangerZonePanel({
           onClick={() => setConfirmOpen(true)}
           className="border border-red-300 text-red-700 text-sm font-medium px-4 py-2 rounded hover:bg-red-50 transition"
         >
-          Delete my account
+          {t('dash.danger.deleteAccount', { defaultValue: 'Delete my account' })}
         </button>
       ) : (
         // Confirmation form: type business name to proceed.
         <div className="bg-red-50 border border-red-200 rounded-md p-4 space-y-3">
           <div className="text-sm text-red-900 space-y-1">
-            <p className="font-semibold">This will permanently delete:</p>
+            <p className="font-semibold">{t('dash.danger.willDelete', { defaultValue: 'This will permanently delete:' })}</p>
             <ul className="list-disc list-inside text-xs text-red-700 space-y-0.5 ml-1">
-              <li>Your account and all settings</li>
-              <li>Your campaign and all locations</li>
-              <li>All customer loyalty cards and their stamps</li>
-              <li>All activity history and insights</li>
+              <li>{t('dash.danger.li1', { defaultValue: 'Your account and all settings' })}</li>
+              <li>{t('dash.danger.li2', { defaultValue: 'Your campaign and all locations' })}</li>
+              <li>{t('dash.danger.li3', { defaultValue: 'All customer loyalty cards and their stamps' })}</li>
+              <li>{t('dash.danger.li4', { defaultValue: 'All activity history and insights' })}</li>
             </ul>
             <p className="text-xs text-red-700 italic pt-1">
-              Your customers will lose access to their cards. This cannot be undone.
+              {t('dash.danger.customersLose', { defaultValue: 'Your customers will lose access to their cards. This cannot be undone.' })}
             </p>
           </div>
           <div className="space-y-1.5">
             <label className="text-xs font-medium text-red-900 block">
-              Type <strong className="font-mono">{businessName}</strong> to confirm:
+              {t('dash.danger.typeA', { defaultValue: 'Type' })} <strong className="font-mono">{businessName}</strong> {t('dash.danger.typeB', { defaultValue: 'to confirm:' })}
             </label>
             <input
               type="text"
@@ -134,7 +135,7 @@ export function DangerZonePanel({
               disabled={deleting}
               className="text-sm px-3 py-1.5 rounded border notion-border hover:bg-white text-gray-600 disabled:opacity-50"
             >
-              Cancel
+              {t('dash.danger.cancel', { defaultValue: 'Cancel' })}
             </button>
             <button
               onClick={handleDelete}
@@ -142,7 +143,7 @@ export function DangerZonePanel({
               className="bg-red-600 text-white text-sm font-medium px-4 py-1.5 rounded hover:bg-red-700 disabled:opacity-50 flex items-center gap-2"
             >
               {deleting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-              Delete forever
+              {t('dash.danger.deleteForever', { defaultValue: 'Delete forever' })}
             </button>
           </div>
         </div>

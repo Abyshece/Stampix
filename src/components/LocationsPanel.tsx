@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { MapPin, Plus, Archive, Loader2, X, Edit2, Check, Lock } from 'lucide-react';
 import type { Location } from '../types';
 import { searchAddresses, type AddressHit } from '../lib/geocode';
+import { useTranslation } from 'react-i18next';
 
 interface LocationsPanelProps {
   locations: Location[];
@@ -28,6 +29,7 @@ function AddressAutocomplete({
   initial: string;
   onPick: (label: string, lat: number | null, lng: number | null) => void;
 }) {
+  const { t } = useTranslation();
   const [q, setQ] = useState(initial);
   const [hits, setHits] = useState<AddressHit[]>([]);
   const [open, setOpen] = useState(false);
@@ -57,12 +59,12 @@ function AddressAutocomplete({
         onChange={(e) => { setQ(e.target.value); onPick(e.target.value, null, null); }}
         onFocus={() => { if (hits.length) setOpen(true); }}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
-        placeholder="Search your address (street, city)…"
+        placeholder={t('dash.loc.searchPh', { defaultValue: 'Search your address (street, city)…' })}
         className={inp}
       />
       {open && (loading || hits.length > 0) && (
         <div className="absolute z-20 mt-1 w-full max-h-56 overflow-y-auto rounded-md border notion-border bg-white shadow-lg">
-          {loading && <div className="px-3 py-2 text-xs text-gray-400">Searching…</div>}
+          {loading && <div className="px-3 py-2 text-xs text-gray-400">{t('dash.loc.searching', { defaultValue: 'Searching…' })}</div>}
           {hits.map((h, i) => (
             <button
               key={i}
@@ -79,9 +81,9 @@ function AddressAutocomplete({
   );
 }
 
-const coordLine = (lat: number, lng: number) => (
+const coordLine = (lat: number, lng: number, label: string) => (
   <div className="text-xs text-green-600 mt-0.5">
-    📍 {lat.toFixed(5)}, {lng.toFixed(5)} · Auto geo-location on
+    📍 {lat.toFixed(5)}, {lng.toFixed(5)} · {label}
   </div>
 );
 
@@ -91,6 +93,7 @@ const coordLine = (lat: number, lng: number) => (
  * Archiving (not hard deletion) keeps old activities' location references intact.
  */
 export function LocationsPanel({ locations, activeLocationId, onAdd, onUpdate, isPro, onUpgrade }: LocationsPanelProps) {
+  const { t } = useTranslation();
   const [addingName, setAddingName] = useState('');
   const [addingAddress, setAddingAddress] = useState('');
   const [addingLat, setAddingLat] = useState<number | null>(null);
@@ -121,7 +124,7 @@ export function LocationsPanel({ locations, activeLocationId, onAdd, onUpdate, i
       await onAdd(addingName.trim(), addingAddress.trim() || undefined, addingLat, addingLng);
       resetAdd();
     } catch (e) {
-      alert(e instanceof Error ? e.message : 'Could not add location');
+      alert(e instanceof Error ? e.message : t('dash.loc.errAdd', { defaultValue: 'Could not add location' }));
     } finally {
       setBusy(false);
     }
@@ -147,7 +150,7 @@ export function LocationsPanel({ locations, activeLocationId, onAdd, onUpdate, i
       });
       setEditingId(null);
     } catch (e) {
-      alert(e instanceof Error ? e.message : 'Could not save');
+      alert(e instanceof Error ? e.message : t('dash.loc.errSave', { defaultValue: 'Could not save' }));
     } finally {
       setBusy(false);
     }
@@ -155,10 +158,10 @@ export function LocationsPanel({ locations, activeLocationId, onAdd, onUpdate, i
 
   const handleArchive = async (loc: Location) => {
     if (active.length <= 1) {
-      alert('You must have at least one active location. Add another location before archiving this one.');
+      alert(t('dash.loc.errMinOne', { defaultValue: 'You must have at least one active location. Add another location before archiving this one.' }));
       return;
     }
-    if (!confirm(`Archive "${loc.name}"? Past stamps will still show this location, but it won't appear in pickers or generate QR codes.`)) return;
+    if (!confirm(t('dash.loc.confirmArchive', { name: loc.name, defaultValue: 'Archive "{{name}}"? Past stamps will still show this location, but it won\'t appear in pickers or generate QR codes.' }))) return;
     setBusy(true);
     try {
       await onUpdate(loc.id, { archived: true });
@@ -181,10 +184,10 @@ export function LocationsPanel({ locations, activeLocationId, onAdd, onUpdate, i
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold flex items-center gap-2">
-            <MapPin className="w-5 h-5 text-gray-500" /> Locations
+            <MapPin className="w-5 h-5 text-gray-500" /> {t('dash.loc.title', { defaultValue: 'Locations' })}
           </h3>
           <p className="text-sm text-gray-500 mt-1">
-            Each branch gets its own QR poster. Stamps are recorded per location.
+            {t('dash.loc.sub', { defaultValue: 'Each branch gets its own QR poster. Stamps are recorded per location.' })}
           </p>
         </div>
         {!isAdding && (
@@ -193,15 +196,15 @@ export function LocationsPanel({ locations, activeLocationId, onAdd, onUpdate, i
               onClick={() => setIsAdding(true)}
               className="text-sm bg-[#37352F] text-white px-3 py-1.5 rounded-md font-medium hover:bg-opacity-90 transition flex items-center gap-1.5"
             >
-              <Plus className="w-4 h-4" /> Add location
+              <Plus className="w-4 h-4" /> {t('dash.loc.addLocation', { defaultValue: 'Add location' })}
             </button>
           ) : (
             <button
               onClick={onUpgrade}
-              title="Multiple locations is a Pro feature"
+              title={t('dash.loc.proTitle', { defaultValue: 'Multiple locations is a Pro feature' })}
               className="text-sm bg-white border notion-border text-gray-600 px-3 py-1.5 rounded-md font-medium hover:border-[#37352F] transition flex items-center gap-1.5"
             >
-              <Lock className="w-3.5 h-3.5 text-amber-500" /> Add location
+              <Lock className="w-3.5 h-3.5 text-amber-500" /> {t('dash.loc.addLocation', { defaultValue: 'Add location' })}
               <span className="text-[9px] uppercase tracking-wider text-amber-600 font-bold">Pro</span>
             </button>
           )
@@ -213,7 +216,7 @@ export function LocationsPanel({ locations, activeLocationId, onAdd, onUpdate, i
           <input
             value={addingName}
             onChange={(e) => setAddingName(e.target.value)}
-            placeholder='Name (e.g. "Downtown branch")'
+            placeholder={t('dash.loc.namePh', { defaultValue: 'Name (e.g. "Downtown branch")' })}
             className="w-full bg-white border notion-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300"
             autoFocus
           />
@@ -221,17 +224,17 @@ export function LocationsPanel({ locations, activeLocationId, onAdd, onUpdate, i
             initial=""
             onPick={(label, lat, lng) => { setAddingAddress(label); setAddingLat(lat); setAddingLng(lng); }}
           />
-          {addingLat != null && addingLng != null && coordLine(addingLat, addingLng)}
+          {addingLat != null && addingLng != null && coordLine(addingLat, addingLng, t('dash.loc.geoOn', { defaultValue: 'Auto geo-location on' }))}
           <div className="flex gap-2 justify-end">
             <button onClick={resetAdd} className="text-sm text-gray-500 hover:text-[#37352F] px-3 py-1.5">
-              Cancel
+              {t('dash.loc.cancel', { defaultValue: 'Cancel' })}
             </button>
             <button
               onClick={handleAdd}
               disabled={!addingName.trim() || busy}
               className="text-sm bg-[#37352F] text-white px-3 py-1.5 rounded-md font-medium disabled:opacity-50 flex items-center gap-1.5"
             >
-              {busy && <Loader2 className="w-3 h-3 animate-spin" />} Save
+              {busy && <Loader2 className="w-3 h-3 animate-spin" />} {t('dash.loc.save', { defaultValue: 'Save' })}
             </button>
           </div>
         </div>
@@ -251,7 +254,7 @@ export function LocationsPanel({ locations, activeLocationId, onAdd, onUpdate, i
                   initial={editAddress}
                   onPick={(label, lat, lng) => { setEditAddress(label); setEditLat(lat); setEditLng(lng); }}
                 />
-                {editLat != null && editLng != null && coordLine(editLat, editLng)}
+                {editLat != null && editLng != null && coordLine(editLat, editLng, t('dash.loc.geoOn', { defaultValue: 'Auto geo-location on' }))}
               </div>
             ) : (
               <div className="flex-1">
@@ -259,34 +262,34 @@ export function LocationsPanel({ locations, activeLocationId, onAdd, onUpdate, i
                   <span className="font-medium text-sm">{loc.name}</span>
                   {loc.id === activeLocationId && (
                     <span className="text-[9px] uppercase tracking-wider text-green-700 bg-green-50 border border-green-100 px-1.5 py-0.5 rounded">
-                      Active scanner
+                      {t('dash.loc.activeScanner', { defaultValue: 'Active scanner' })}
                     </span>
                   )}
                 </div>
                 {loc.address && <div className="text-xs text-gray-500 mt-0.5">{loc.address}</div>}
                 {loc.latitude != null && loc.longitude != null ? (
-                  coordLine(loc.latitude, loc.longitude)
+                  coordLine(loc.latitude, loc.longitude, t('dash.loc.geoOn', { defaultValue: 'Auto geo-location on' }))
                 ) : loc.address ? (
-                  <div className="text-xs text-amber-600 mt-0.5">Pick your address from the search suggestions to turn on geo-location</div>
+                  <div className="text-xs text-amber-600 mt-0.5">{t('dash.loc.pickAddress', { defaultValue: 'Pick your address from the search suggestions to turn on geo-location' })}</div>
                 ) : null}
               </div>
             )}
             <div className="flex items-center gap-1">
               {editingId === loc.id ? (
                 <>
-                  <button onClick={() => setEditingId(null)} className="p-2 text-gray-400 hover:text-[#37352F]" aria-label="Cancel">
+                  <button onClick={() => setEditingId(null)} className="p-2 text-gray-400 hover:text-[#37352F]" aria-label={t('dash.loc.ariaCancel', { defaultValue: 'Cancel' })}>
                     <X className="w-4 h-4" />
                   </button>
-                  <button onClick={saveEdit} disabled={busy} className="p-2 text-green-600 hover:bg-green-50 rounded" aria-label="Save">
+                  <button onClick={saveEdit} disabled={busy} className="p-2 text-green-600 hover:bg-green-50 rounded" aria-label={t('dash.loc.ariaSave', { defaultValue: 'Save' })}>
                     <Check className="w-4 h-4" />
                   </button>
                 </>
               ) : (
                 <>
-                  <button onClick={() => beginEdit(loc)} className="p-2 text-gray-400 hover:text-[#37352F] rounded" aria-label="Edit">
+                  <button onClick={() => beginEdit(loc)} className="p-2 text-gray-400 hover:text-[#37352F] rounded" aria-label={t('dash.loc.ariaEdit', { defaultValue: 'Edit' })}>
                     <Edit2 className="w-4 h-4" />
                   </button>
-                  <button onClick={() => handleArchive(loc)} className="p-2 text-gray-400 hover:text-red-500 rounded" aria-label="Archive">
+                  <button onClick={() => handleArchive(loc)} className="p-2 text-gray-400 hover:text-red-500 rounded" aria-label={t('dash.loc.ariaArchive', { defaultValue: 'Archive' })}>
                     <Archive className="w-4 h-4" />
                   </button>
                 </>
@@ -297,14 +300,14 @@ export function LocationsPanel({ locations, activeLocationId, onAdd, onUpdate, i
 
         {active.length === 0 && (
           <p className="text-sm text-gray-400 italic px-3 py-4 text-center">
-            No locations yet. Add one to start stamping.
+            {t('dash.loc.noLocations', { defaultValue: 'No locations yet. Add one to start stamping.' })}
           </p>
         )}
       </div>
 
       {archived.length > 0 && (
         <div className="pt-4 border-t notion-border space-y-2">
-          <h4 className="text-xs font-bold uppercase text-gray-400 tracking-wider">Archived</h4>
+          <h4 className="text-xs font-bold uppercase text-gray-400 tracking-wider">{t('dash.loc.archived', { defaultValue: 'Archived' })}</h4>
           {archived.map((loc) => (
             <div key={loc.id} className="flex items-center justify-between bg-white rounded-md p-3 border notion-border">
               <div>
@@ -315,7 +318,7 @@ export function LocationsPanel({ locations, activeLocationId, onAdd, onUpdate, i
                 onClick={() => handleUnarchive(loc)}
                 className="text-xs text-gray-500 hover:text-[#37352F] px-3 py-1.5 border notion-border rounded"
               >
-                Restore
+                {t('dash.loc.restore', { defaultValue: 'Restore' })}
               </button>
             </div>
           ))}

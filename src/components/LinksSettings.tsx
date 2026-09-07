@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { updateCampaign } from '../lib/db';
 import type { Campaign } from '../types';
 import { Loader2, Check, Link as LinkIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 // Keep these keys in sync with the wallet functions (generate-apple-pass /
 // sync-wallet-object) which read the same keys from campaign.social_links.
@@ -31,6 +32,7 @@ export function LinksSettings({
   campaign: Campaign;
   onUpdated: (c: Campaign) => void;
 }) {
+  const { t } = useTranslation();
   const [links, setLinks] = useState<Record<string, string>>(campaign.socialLinks ?? {});
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -51,7 +53,7 @@ export function LinksSettings({
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } catch (e) {
-      setErr(e instanceof Error ? e.message : 'Could not save your links');
+      setErr(e instanceof Error ? e.message : t('dash.links.errSave', { defaultValue: 'Could not save your links' }));
     } finally {
       setSaving(false);
     }
@@ -60,20 +62,19 @@ export function LinksSettings({
   return (
     <div className="space-y-5 max-w-xl">
       <p className="text-xs text-gray-400">
-        Fill in any of these — each one appears as a tappable link on the <b>back</b> of the customer's Apple Wallet
-        card (tap the ••• button) and in the Google Wallet card details. Leave the rest blank.
+        {t('dash.links.descA', { defaultValue: 'Fill in any of these — each one appears as a tappable link on the' })} <b>{t('dash.links.descBold', { defaultValue: 'back' })}</b> {t('dash.links.descB', { defaultValue: "of the customer's Apple Wallet card (tap the ••• button) and in the Google Wallet card details. Leave the rest blank." })}
       </p>
 
       <div className="space-y-3">
         {LINK_FIELDS.map((f) => (
           <div key={f.key} className="space-y-1">
-            <label className="text-xs font-bold uppercase text-gray-400 tracking-wider">{f.label}</label>
+            <label className="text-xs font-bold uppercase text-gray-400 tracking-wider">{t(`dash.links.${f.key}`, { defaultValue: f.label })}</label>
             <input
               type="url"
               inputMode="url"
               value={links[f.key] ?? ''}
               onChange={(e) => setLinks((p) => ({ ...p, [f.key]: e.target.value }))}
-              placeholder={f.placeholder}
+              placeholder={t(`dash.links.${f.key}Ph`, { defaultValue: f.placeholder })}
               className="w-full bg-[#F7F7F5] border notion-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#37352F]/20"
             />
           </div>
@@ -88,11 +89,11 @@ export function LinksSettings({
         className="bg-[#37352F] text-white text-sm px-4 py-2 rounded-md hover:bg-opacity-90 transition disabled:opacity-50 flex items-center gap-2"
       >
         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <Check className="w-4 h-4" /> : <LinkIcon className="w-4 h-4" />}
-        {saved ? 'Saved' : 'Save links'}
+        {saved ? t('dash.links.saved', { defaultValue: 'Saved' }) : t('dash.links.save', { defaultValue: 'Save links' })}
       </button>
 
       <p className="text-[11px] text-gray-400">
-        Existing cardholders get the new links automatically the next time their pass refreshes.
+        {t('dash.links.footer', { defaultValue: 'Existing cardholders get the new links automatically the next time their pass refreshes.' })}
       </p>
     </div>
   );

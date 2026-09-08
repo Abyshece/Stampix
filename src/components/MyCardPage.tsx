@@ -11,6 +11,7 @@ import { verifyTurnstile } from '../services/turnstile';
 import { DownloadMyDataButton } from './DownloadMyDataButton';
 import { AddToAppleWalletButton } from './AddToAppleWalletButton';
 import { Logo } from './Logo';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Self-service page where any customer can look up their loyalty cards.
@@ -25,6 +26,7 @@ import { Logo } from './Logo';
  * Wallet or Google Wallet. Bookmarking this URL keeps the card one tap away.
  */
 export function MyCardPage({ onExit }: { onExit: () => void }) {
+  const { t } = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [sending, setSending] = useState(false);
@@ -125,10 +127,7 @@ export function MyCardPage({ onExit }: { onExit: () => void }) {
     const code = params.get('error_code');
     const desc = params.get('error_description');
     if (code === 'otp_expired') {
-      setLinkError(
-        'That sign-in link has expired or was already used. ' +
-        'Enter your email below to get a fresh link.'
-      );
+      setLinkError(t('cust.mycard.linkExpired', { defaultValue: 'That sign-in link has expired or was already used. Enter your email below to get a fresh link.' }));
     } else if (code) {
       setLinkError(desc ? decodeURIComponent(desc.replace(/\+/g, ' ')) : code);
     }
@@ -177,7 +176,7 @@ export function MyCardPage({ onExit }: { onExit: () => void }) {
       if (turnstileToken) {
         const ok = await verifyTurnstile(turnstileToken);
         if (!ok) {
-          setError('Security check failed. Please try again.');
+          setError(t('cust.mycard.errSecurityFailed', { defaultValue: 'Security check failed. Please try again.' }));
           setTurnstileToken(null);
           setSending(false);
           return;
@@ -202,7 +201,7 @@ export function MyCardPage({ onExit }: { onExit: () => void }) {
         setLinkSent(true);
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not sign you in');
+      setError(e instanceof Error ? e.message : t('cust.mycard.errSignIn', { defaultValue: 'Could not sign you in' }));
     } finally {
       setSending(false);
     }
@@ -224,7 +223,7 @@ export function MyCardPage({ onExit }: { onExit: () => void }) {
       if (res.error) throw res.error;
       // Auth state change re-renders into the signed-in branch.
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Invalid or expired code. Please try again.');
+      setError(e instanceof Error ? e.message : t('cust.mycard.errCode', { defaultValue: 'Invalid or expired code. Please try again.' }));
     } finally {
       setSending(false);
     }
@@ -239,9 +238,9 @@ export function MyCardPage({ onExit }: { onExit: () => void }) {
     setCodeBusy(true); setCodeMsg(null); setCodeErr(false);
     try {
       await setRecoveryCode(newCode);
-      setCodeMsg('Recovery code updated.'); setNewCode('');
+      setCodeMsg(t('cust.mycard.codeUpdated', { defaultValue: 'Recovery code updated.' })); setNewCode('');
     } catch (e) {
-      setCodeErr(true); setCodeMsg(e instanceof Error ? e.message : 'Could not update the code');
+      setCodeErr(true); setCodeMsg(e instanceof Error ? e.message : t('cust.mycard.errCodeUpdate', { defaultValue: 'Could not update the code' }));
     } finally { setCodeBusy(false); }
   };
 
@@ -278,10 +277,9 @@ export function MyCardPage({ onExit }: { onExit: () => void }) {
               <div className="w-12 h-12 mx-auto bg-[#37352F] rounded-full flex items-center justify-center">
                 <Mail className="w-6 h-6 text-white" />
               </div>
-              <h2 className="text-2xl font-serif-display font-semibold">Check your email</h2>
+              <h2 className="text-2xl font-serif-display font-semibold">{t('cust.mycard.checkEmail', { defaultValue: 'Check your email' })}</h2>
               <p className="text-sm text-gray-500 leading-relaxed max-w-sm mx-auto">
-                We sent a 6-digit sign-in code to <strong className="text-[#37352F]">{email}</strong>.
-                Enter it below to reach your loyalty card.
+                {t('cust.mycard.sentCodeA', { defaultValue: 'We sent a 6-digit sign-in code to' })} <strong className="text-[#37352F]">{email}</strong>{t('cust.mycard.sentCodeB', { defaultValue: '. Enter it below to reach your loyalty card.' })}
               </p>
               <div className="space-y-3 max-w-[15rem] mx-auto">
                 <input
@@ -290,7 +288,7 @@ export function MyCardPage({ onExit }: { onExit: () => void }) {
                   autoComplete="one-time-code"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  placeholder="123456"
+                  placeholder={t('cust.mycard.otpPh', { defaultValue: '123456' })}
                   autoFocus
                   className="w-full bg-[#F7F7F5] border notion-border rounded-md px-4 py-3 text-center text-lg font-semibold tracking-[0.4em] focus:outline-none focus:ring-2 focus:ring-[#37352F]/20"
                   onKeyDown={(e) => { if (e.key === 'Enter') handleVerifyOtp(); }}
@@ -303,22 +301,22 @@ export function MyCardPage({ onExit }: { onExit: () => void }) {
                   disabled={otp.length < 6 || sending}
                   className="w-full bg-[#37352F] text-white py-3 rounded-md font-medium text-sm hover:bg-opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Verify & sign in'}
+                  {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : t('cust.mycard.verifySignIn', { defaultValue: 'Verify & sign in' })}
                 </button>
               </div>
               <button
                 onClick={() => { setLinkSent(false); setError(null); setOtp(''); }}
                 className="text-xs text-gray-500 hover:text-[#37352F] transition underline"
               >
-                Use a different email
+                {t('cust.mycard.differentEmail', { defaultValue: 'Use a different email' })}
               </button>
             </div>
           ) : (
           <>
           <div className="text-center space-y-2">
-            <h2 className="text-2xl font-serif-display font-semibold">Find my loyalty card</h2>
+            <h2 className="text-2xl font-serif-display font-semibold">{t('cust.mycard.findCardTitle', { defaultValue: 'Find my loyalty card' })}</h2>
             <p className="text-sm text-gray-500 leading-relaxed max-w-sm mx-auto">
-              Enter the email you signed up with — we'll send a sign-in link.
+              {t('cust.mycard.findCardSub', { defaultValue: "Enter the email you signed up with — we'll send a sign-in link." })}
             </p>
           </div>
           <div className="space-y-3">
@@ -326,7 +324,7 @@ export function MyCardPage({ onExit }: { onExit: () => void }) {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
+              placeholder={t('cust.mycard.emailPh', { defaultValue: 'you@example.com' })}
               autoFocus
               className="w-full bg-[#F7F7F5] border notion-border rounded-md px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#37352F]/20"
               onKeyDown={(e) => { if (e.key === 'Enter') handleSendLink(); }}
@@ -344,7 +342,7 @@ export function MyCardPage({ onExit }: { onExit: () => void }) {
               className="w-full bg-[#37352F] text-white py-3 rounded-md font-medium text-sm hover:bg-opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : (
-                <>Find my card <ArrowLeft className="w-4 h-4 rotate-180" /></>
+                <>{t('cust.mycard.findCard', { defaultValue: 'Find my card' })} <ArrowLeft className="w-4 h-4 rotate-180" /></>
               )}
             </button>
           </div>
@@ -352,13 +350,13 @@ export function MyCardPage({ onExit }: { onExit: () => void }) {
             <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 text-xs text-blue-800 flex gap-2">
               <Smartphone className="w-4 h-4 flex-shrink-0 mt-0.5" />
               <div>
-                <strong>iPhone tip:</strong> tap <strong>Share</strong> →{' '}
-                <strong>Add to Home Screen</strong> to keep this page one tap away.
+                <strong>{t('cust.mycard.iosTip', { defaultValue: 'iPhone tip:' })}</strong> {t('cust.mycard.iosTap', { defaultValue: 'tap' })} <strong>{t('cust.mycard.iosShare', { defaultValue: 'Share' })}</strong> →{' '}
+                <strong>{t('cust.mycard.iosAddHome', { defaultValue: 'Add to Home Screen' })}</strong> {t('cust.mycard.iosKeep', { defaultValue: 'to keep this page one tap away.' })}
               </div>
             </div>
           )}
           <p className="text-[11px] text-gray-500 text-center">
-            Haven't signed up yet? Scan a merchant's QR poster to join their program.
+            {t('cust.mycard.notSignedUp', { defaultValue: "Haven't signed up yet? Scan a merchant's QR poster to join their program." })}
           </p>
           </>
           )}
@@ -382,18 +380,18 @@ export function MyCardPage({ onExit }: { onExit: () => void }) {
     <Shell onExit={onExit} onSignOut={handleSignOut}>
       <div className="space-y-6 py-2">
         <div className="space-y-1">
-          <h2 className="text-2xl font-serif-display font-semibold">Your loyalty cards</h2>
+          <h2 className="text-2xl font-serif-display font-semibold">{t('cust.mycard.yourCards', { defaultValue: 'Your loyalty cards' })}</h2>
           <p className="text-sm text-gray-500">
-            Signed in as <strong className="text-[#37352F]">{user.email}</strong>
+            {t('cust.mycard.signedInAs', { defaultValue: 'Signed in as' })} <strong className="text-[#37352F]">{user.email}</strong>
           </p>
         </div>
 
         {cards.length === 0 ? (
           <div className="bg-[#F7F7F5] border notion-border rounded-lg p-8 text-center space-y-3">
             <div className="text-3xl">🎯</div>
-            <h3 className="font-medium">No cards yet</h3>
+            <h3 className="font-medium">{t('cust.mycard.noCards', { defaultValue: 'No cards yet' })}</h3>
             <p className="text-sm text-gray-500 max-w-xs mx-auto">
-              Scan a merchant's QR poster to join your first loyalty program.
+              {t('cust.mycard.noCardsSub', { defaultValue: "Scan a merchant's QR poster to join your first loyalty program." })}
             </p>
           </div>
         ) : (
@@ -421,11 +419,11 @@ export function MyCardPage({ onExit }: { onExit: () => void }) {
 
         {/* Change recovery code */}
         <div className="bg-[#F7F7F5] border notion-border rounded-lg p-4 space-y-2">
-          <p className="text-sm font-medium">Change your recovery code</p>
-          <p className="text-xs text-gray-500">The 6-digit code you use with your email to get your card back on a new phone. Set a new one anytime.</p>
+          <p className="text-sm font-medium">{t('cust.mycard.changeCode', { defaultValue: 'Change your recovery code' })}</p>
+          <p className="text-xs text-gray-500">{t('cust.mycard.changeCodeSub', { defaultValue: 'The 6-digit code you use with your email to get your card back on a new phone. Set a new one anytime.' })}</p>
           <div className="flex gap-2 items-center">
-            <input value={newCode} onChange={(e) => setNewCode(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))} inputMode="numeric" placeholder="New 6-digit code" className="border notion-border rounded px-3 py-2 text-sm w-40 tracking-widest" />
-            <button onClick={handleChangeCode} disabled={codeBusy || newCode.length !== 6} className="text-sm bg-[#37352F] text-white px-3 py-2 rounded disabled:opacity-40">{codeBusy ? 'Saving…' : 'Update'}</button>
+            <input value={newCode} onChange={(e) => setNewCode(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))} inputMode="numeric" placeholder={t('cust.mycard.newCodePh', { defaultValue: 'New 6-digit code' })} className="border notion-border rounded px-3 py-2 text-sm w-40 tracking-widest" />
+            <button onClick={handleChangeCode} disabled={codeBusy || newCode.length !== 6} className="text-sm bg-[#37352F] text-white px-3 py-2 rounded disabled:opacity-40">{codeBusy ? t('cust.mycard.saving', { defaultValue: 'Saving…' }) : t('cust.mycard.update', { defaultValue: 'Update' })}</button>
           </div>
           {codeMsg && <p className={`text-xs ${codeErr ? 'text-red-600' : 'text-green-600'}`}>{codeMsg}</p>}
         </div>
@@ -434,8 +432,8 @@ export function MyCardPage({ onExit }: { onExit: () => void }) {
         <div className="bg-[#F7F7F5] border notion-border rounded-lg p-3 text-xs text-gray-600 flex gap-2">
           <Bookmark className="w-4 h-4 flex-shrink-0 mt-0.5 text-gray-500" />
           <div>
-            <strong>Tip:</strong> bookmark this page (<code className="bg-white px-1 rounded">stampfix.app/my-card</code>) to get back here anytime.
-            {isIOS && ' On iPhone, tap Share → Add to Home Screen.'}
+            <strong>{t('cust.mycard.bmTip', { defaultValue: 'Tip:' })}</strong> {t('cust.mycard.bmBookmark', { defaultValue: 'bookmark this page (' })}<code className="bg-white px-1 rounded">stampfix.app/my-card</code>{t('cust.mycard.bmAnytime', { defaultValue: ') to get back here anytime.' })}
+            {isIOS && ` ${t('cust.mycard.bmIos', { defaultValue: 'On iPhone, tap Share → Add to Home Screen.' })}`}
           </div>
         </div>
 
@@ -444,7 +442,7 @@ export function MyCardPage({ onExit }: { onExit: () => void }) {
             it must be available to anyone who asks for their data. */}
         <div className="pt-2 border-t notion-border space-y-1.5">
           <p className="text-xs text-gray-500">
-            Download a JSON copy of all your data on Stampfix.
+            {t('cust.mycard.downloadData', { defaultValue: 'Download a JSON copy of all your data on Stampfix.' })}
           </p>
           <DownloadMyDataButton variant="customer" />
         </div>
@@ -458,6 +456,7 @@ export function MyCardPage({ onExit }: { onExit: () => void }) {
 function Shell({
   children, onExit, onSignOut,
 }: { children: React.ReactNode; onExit: () => void; onSignOut?: () => void }) {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-white text-[#37352F]">
       <header className="border-b notion-border sticky top-0 bg-white/95 backdrop-blur-sm z-10">
@@ -471,14 +470,14 @@ function Shell({
               onClick={onSignOut}
               className="text-xs text-gray-500 hover:text-[#37352F] transition flex items-center gap-1"
             >
-              <LogOut className="w-3 h-3" /> Sign out
+              <LogOut className="w-3 h-3" /> {t('cust.mycard.signOut', { defaultValue: 'Sign out' })}
             </button>
           ) : (
             <button
               onClick={onExit}
               className="text-xs text-gray-500 hover:text-[#37352F] transition flex items-center gap-1"
             >
-              <ArrowLeft className="w-3 h-3" /> Home
+              <ArrowLeft className="w-3 h-3" /> {t('cust.mycard.home', { defaultValue: 'Home' })}
             </button>
           )}
         </div>
@@ -502,6 +501,7 @@ function Shell({
  * but not so prominent that customers click it accidentally.
  */
 function DeletionRow({ card, onRefresh }: { card: UserCard; onRefresh: () => void }) {
+  const { t } = useTranslation();
   const [busy, setBusy] = useState(false);
   const isPending = !!card.deletionRequestedAt;
   const requestedAt = card.deletionRequestedAt ? new Date(card.deletionRequestedAt) : null;
@@ -511,17 +511,13 @@ function DeletionRow({ card, onRefresh }: { card: UserCard; onRefresh: () => voi
   const hoursRemaining = Math.max(0, 24 - hoursPending);
 
   const handleRequest = async () => {
-    if (!confirm(
-      `Request deletion of this loyalty card?\n\n` +
-      `Your stamps and history will be permanently removed within 24 hours. ` +
-      `You can cancel anytime during that window.`
-    )) return;
+    if (!confirm(t('cust.mycard.confirmDelete', { defaultValue: 'Request deletion of this loyalty card?\n\nYour stamps and history will be permanently removed within 24 hours. You can cancel anytime during that window.' }))) return;
     setBusy(true);
     try {
       await requestCardDeletion(card.id);
       await onRefresh();
     } catch (e) {
-      alert(e instanceof Error ? e.message : 'Could not request deletion');
+      alert(e instanceof Error ? e.message : t('cust.mycard.errRequestDeletion', { defaultValue: 'Could not request deletion' }));
     } finally {
       setBusy(false);
     }
@@ -533,7 +529,7 @@ function DeletionRow({ card, onRefresh }: { card: UserCard; onRefresh: () => voi
       await cancelCardDeletion(card.id);
       await onRefresh();
     } catch (e) {
-      alert(e instanceof Error ? e.message : 'Could not cancel');
+      alert(e instanceof Error ? e.message : t('cust.mycard.errCancel', { defaultValue: 'Could not cancel' }));
     } finally {
       setBusy(false);
     }
@@ -544,9 +540,9 @@ function DeletionRow({ card, onRefresh }: { card: UserCard; onRefresh: () => voi
       <div className="bg-amber-50 border border-amber-200 rounded-md px-3 py-2 text-xs">
         <div className="flex items-start gap-2">
           <div className="flex-1">
-            <div className="font-medium text-amber-900">Deletion pending</div>
+            <div className="font-medium text-amber-900">{t('cust.mycard.deletionPending', { defaultValue: 'Deletion pending' })}</div>
             <div className="text-amber-700 mt-0.5">
-              This card will be deleted in about {hoursRemaining} hour{hoursRemaining === 1 ? '' : 's'}. No more stamps can be added.
+              {t('cust.mycard.delPendingA', { defaultValue: 'This card will be deleted in about' })} {hoursRemaining} {hoursRemaining === 1 ? t('cust.mycard.hourOne', { defaultValue: 'hour' }) : t('cust.mycard.hourOther', { defaultValue: 'hours' })}{t('cust.mycard.delPendingB', { defaultValue: '. No more stamps can be added.' })}
             </div>
           </div>
           <button
@@ -554,7 +550,7 @@ function DeletionRow({ card, onRefresh }: { card: UserCard; onRefresh: () => voi
             disabled={busy}
             className="bg-white border border-amber-300 text-amber-800 px-2 py-1 rounded text-xs font-medium hover:bg-amber-100 disabled:opacity-50 whitespace-nowrap"
           >
-            {busy ? '...' : 'Cancel'}
+            {busy ? '...' : t('cust.mycard.cancel', { defaultValue: 'Cancel' })}
           </button>
         </div>
       </div>
@@ -568,7 +564,7 @@ function DeletionRow({ card, onRefresh }: { card: UserCard; onRefresh: () => voi
         disabled={busy}
         className="text-[11px] text-gray-500 hover:text-red-600 underline disabled:opacity-50 transition"
       >
-        {busy ? 'Working...' : 'Request data deletion'}
+        {busy ? t('cust.mycard.working', { defaultValue: 'Working...' }) : t('cust.mycard.requestDeletion', { defaultValue: 'Request data deletion' })}
       </button>
     </div>
   );
@@ -584,6 +580,7 @@ function DeletionRow({ card, onRefresh }: { card: UserCard; onRefresh: () => voi
  * need to change email contact support.
  */
 function EditProfileRow({ card, onRefresh }: { card: UserCard; onRefresh: () => void }) {
+  const { t } = useTranslation();
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(card.customerName);
   const [busy, setBusy] = useState(false);
@@ -591,7 +588,7 @@ function EditProfileRow({ card, onRefresh }: { card: UserCard; onRefresh: () => 
 
   const handleSave = async () => {
     setError(null);
-    if (!name.trim()) { setError('Name cannot be empty'); return; }
+    if (!name.trim()) { setError(t('cust.mycard.errNameEmpty', { defaultValue: 'Name cannot be empty' })); return; }
     setBusy(true);
     try {
       const { error: rpcErr } = await supabase.rpc('update_my_card_profile', {
@@ -602,7 +599,7 @@ function EditProfileRow({ card, onRefresh }: { card: UserCard; onRefresh: () => 
       setEditing(false);
       await onRefresh();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not update');
+      setError(e instanceof Error ? e.message : t('cust.mycard.errUpdate', { defaultValue: 'Could not update' }));
     } finally {
       setBusy(false);
     }
@@ -615,7 +612,7 @@ function EditProfileRow({ card, onRefresh }: { card: UserCard; onRefresh: () => 
           onClick={() => setEditing(true)}
           className="text-[11px] text-gray-500 hover:text-[#37352F] underline transition"
         >
-          Edit profile
+          {t('cust.mycard.editProfile', { defaultValue: 'Edit profile' })}
         </button>
       </div>
     );
@@ -623,10 +620,10 @@ function EditProfileRow({ card, onRefresh }: { card: UserCard; onRefresh: () => 
 
   return (
     <div className="bg-[#F7F7F5] border notion-border rounded-md p-3 space-y-2 text-xs">
-      <div className="font-medium text-gray-700">Edit profile on this card</div>
+      <div className="font-medium text-gray-700">{t('cust.mycard.editProfileTitle', { defaultValue: 'Edit profile on this card' })}</div>
       <div className="space-y-1.5">
         <label className="block">
-          <span className="text-gray-500 text-[10px] uppercase tracking-wider font-bold">Name</span>
+          <span className="text-gray-500 text-[10px] uppercase tracking-wider font-bold">{t('cust.mycard.name', { defaultValue: 'Name' })}</span>
           <input
             type="text"
             value={name}
@@ -637,7 +634,7 @@ function EditProfileRow({ card, onRefresh }: { card: UserCard; onRefresh: () => 
         </label>
       </div>
       <p className="text-[10px] text-gray-500 leading-snug">
-        Need to change your email? Contact <a href="mailto:hello@stampfix.app" className="underline">hello@stampfix.app</a>.
+        {t('cust.mycard.changeEmailA', { defaultValue: 'Need to change your email? Contact' })} <a href="mailto:hello@stampfix.app" className="underline">hello@stampfix.app</a>{t('cust.mycard.changeEmailB', { defaultValue: '.' })}
       </p>
       {error && <div className="text-red-600 text-[11px]">{error}</div>}
       <div className="flex gap-2 justify-end">
@@ -646,14 +643,14 @@ function EditProfileRow({ card, onRefresh }: { card: UserCard; onRefresh: () => 
           disabled={busy}
           className="text-[11px] px-2 py-1 rounded border notion-border bg-white hover:bg-[#F7F7F5]"
         >
-          Cancel
+          {t('cust.mycard.cancel', { defaultValue: 'Cancel' })}
         </button>
         <button
           onClick={handleSave}
           disabled={busy}
           className="text-[11px] px-3 py-1 rounded bg-[#37352F] text-white hover:bg-opacity-90 disabled:opacity-50"
         >
-          {busy ? 'Saving...' : 'Save'}
+          {busy ? t('cust.mycard.saving', { defaultValue: 'Saving...' }) : t('cust.mycard.save', { defaultValue: 'Save' })}
         </button>
       </div>
     </div>

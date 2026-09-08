@@ -11,6 +11,7 @@ import { AddToAppleWalletButton } from './AddToAppleWalletButton';
 import { Turnstile } from './Turnstile';
 import { verifyTurnstile } from '../services/turnstile';
 import { logConsent, CONSENT_VERSIONS } from '../lib/consent';
+import { useTranslation } from 'react-i18next';
 
 interface CustomerAppProps {
   campaignId: string;
@@ -34,6 +35,7 @@ interface CustomerAppProps {
  * click it, they land here authenticated.
  */
 export function CustomerApp({ campaignId, joinedLocationId, onExit }: CustomerAppProps) {
+  const { t } = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [card, setCard] = useState<UserCard | null>(null);
@@ -70,7 +72,7 @@ export function CustomerApp({ campaignId, joinedLocationId, onExit }: CustomerAp
         const c = await getCampaignById(campaignId);
         if (mounted) setCampaign(c);
       } catch (e) {
-        if (mounted) setError(e instanceof Error ? e.message : 'Could not load campaign');
+        if (mounted) setError(e instanceof Error ? e.message : t('cust.app.errLoadCampaign', { defaultValue: 'Could not load campaign' }));
       }
     })();
     return () => {
@@ -168,7 +170,7 @@ export function CustomerApp({ campaignId, joinedLocationId, onExit }: CustomerAp
         }
         if (mounted) setCard(existing);
       } catch (e) {
-        if (mounted) setError(e instanceof Error ? e.message : 'Could not load card');
+        if (mounted) setError(e instanceof Error ? e.message : t('cust.app.errLoadCard', { defaultValue: 'Could not load card' }));
       } finally {
         if (mounted) setLoading(false);
       }
@@ -181,7 +183,7 @@ export function CustomerApp({ campaignId, joinedLocationId, onExit }: CustomerAp
   const handleSendLink = async () => {
     if (!formData.firstName || !formData.email || !/^\d{6}$/.test(formData.code)) return;
     if (!turnstileToken) {
-      setError('Please complete the security check.');
+      setError(t('cust.app.errSecurity', { defaultValue: 'Please complete the security check.' }));
       return;
     }
     setError(null);
@@ -189,7 +191,7 @@ export function CustomerApp({ campaignId, joinedLocationId, onExit }: CustomerAp
     try {
       const ok = await verifyTurnstile(turnstileToken);
       if (!ok) {
-        setError('Security check failed. Please try again.');
+        setError(t('cust.app.errSecurityFailed', { defaultValue: 'Security check failed. Please try again.' }));
         setTurnstileToken(null);
         setIsSendingLink(false);
         return;
@@ -228,7 +230,7 @@ export function CustomerApp({ campaignId, joinedLocationId, onExit }: CustomerAp
       // re-renders into the signed-in branch, which creates/loads the card.
       await signUpOrInCustomer(formData.email.trim().toLowerCase(), campaignId, formData.phone);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not sign you in');
+      setError(e instanceof Error ? e.message : t('cust.app.errSignIn', { defaultValue: 'Could not sign you in' }));
     } finally {
       setIsSendingLink(false);
     }
@@ -258,19 +260,18 @@ export function CustomerApp({ campaignId, joinedLocationId, onExit }: CustomerAp
           {isLimitError ? (
             <>
               <div className="text-5xl">🎉</div>
-              <h2 className="text-2xl font-serif-display font-semibold">This program is popular!</h2>
+              <h2 className="text-2xl font-serif-display font-semibold">{t('cust.app.popularTitle', { defaultValue: 'This program is popular!' })}</h2>
               <p className="text-gray-600 leading-relaxed">
-                The loyalty program is currently at capacity. Please ask the staff to upgrade their
-                Stampfix account so you can join.
+                {t('cust.app.popularBody', { defaultValue: 'The loyalty program is currently at capacity. Please ask the staff to upgrade their Stampfix account so you can join.' })}
               </p>
               <p className="text-xs text-gray-500">
-                Existing customers can still collect stamps as normal.
+                {t('cust.app.popularExisting', { defaultValue: 'Existing customers can still collect stamps as normal.' })}
               </p>
             </>
           ) : (
-            <p className="text-gray-500">{error || 'No campaign found for this link.'}</p>
+            <p className="text-gray-500">{error || t('cust.app.noCampaign', { defaultValue: 'No campaign found for this link.' })}</p>
           )}
-          <button onClick={onExit} className="text-blue-600 hover:underline">Return Home</button>
+          <button onClick={onExit} className="text-blue-600 hover:underline">{t('cust.app.returnHome', { defaultValue: 'Return Home' })}</button>
         </div>
       </div>
     );
@@ -281,16 +282,16 @@ export function CustomerApp({ campaignId, joinedLocationId, onExit }: CustomerAp
   if (campaign.approvalStatus !== 'approved' && !isOwner) {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-[#37352F] text-center">
-        <button onClick={onExit} aria-label="Go back" className="absolute top-6 left-6 text-gray-500 hover:text-gray-600">
+        <button onClick={onExit} aria-label={t('cust.app.goBack', { defaultValue: 'Go back' })} className="absolute top-6 left-6 text-gray-500 hover:text-gray-600">
           <ArrowLeft className="w-5 h-5" aria-hidden="true" />
         </button>
         <div className="max-w-sm w-full space-y-3">
           <div className="w-12 h-12 bg-[#F7F7F5] rounded-md mx-auto flex items-center justify-center text-xl border notion-border mb-2">
             {campaign.customIcon || '⏳'}
           </div>
-          <h1 className="text-2xl font-serif-display font-semibold">Almost ready</h1>
+          <h1 className="text-2xl font-serif-display font-semibold">{t('cust.app.almostReady', { defaultValue: 'Almost ready' })}</h1>
           <p className="text-gray-500 text-sm">
-            {campaign.businessName}&rsquo;s loyalty card isn&rsquo;t live just yet. They&rsquo;re finishing setup, so please check back soon.
+            {t('cust.app.notApproved', { name: campaign.businessName, defaultValue: "{{name}}'s loyalty card isn't live just yet. They're finishing setup, so please check back soon." })}
           </p>
         </div>
       </div>
@@ -301,7 +302,7 @@ export function CustomerApp({ campaignId, joinedLocationId, onExit }: CustomerAp
   if (!user) {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-[#37352F]">
-        <button onClick={onExit} aria-label="Go back" className="absolute top-6 left-6 text-gray-500 hover:text-gray-600">
+        <button onClick={onExit} aria-label={t('cust.app.goBack', { defaultValue: 'Go back' })} className="absolute top-6 left-6 text-gray-500 hover:text-gray-600">
           <ArrowLeft className="w-5 h-5" aria-hidden="true" />
         </button>
         <div className="max-w-sm w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -309,55 +310,55 @@ export function CustomerApp({ campaignId, joinedLocationId, onExit }: CustomerAp
             <div className="w-12 h-12 bg-[#F7F7F5] rounded-md mx-auto flex items-center justify-center text-xl border notion-border mb-4">
               {campaign.customIcon || '👋'}
             </div>
-            <h1 className="text-2xl font-serif-display font-semibold">Join {campaign.businessName}</h1>
+            <h1 className="text-2xl font-serif-display font-semibold">{t('cust.app.join', { name: campaign.businessName, defaultValue: 'Join {{name}}' })}</h1>
             <p className="text-gray-500 text-sm">{campaign.offerTitle}</p>
           </div>
 
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label htmlFor="sf-firstname" className="text-[11px] font-bold uppercase text-gray-500 tracking-wider">First Name</label>
+                <label htmlFor="sf-firstname" className="text-[11px] font-bold uppercase text-gray-500 tracking-wider">{t('cust.app.firstName', { defaultValue: 'First Name' })}</label>
                 <input
                   id="sf-firstname"
                   value={formData.firstName}
                   maxLength={60}
                   onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                   className="w-full bg-[#F7F7F5] border notion-border rounded-md px-3 py-2.5 focus:outline-none focus:ring-1 focus:ring-gray-400 placeholder-gray-400"
-                  placeholder="Jane"
+                  placeholder={t('cust.app.firstNamePh', { defaultValue: 'Jane' })}
                 />
               </div>
               <div className="space-y-1">
-                <label htmlFor="sf-surname" className="text-[11px] font-bold uppercase text-gray-500 tracking-wider">Surname</label>
+                <label htmlFor="sf-surname" className="text-[11px] font-bold uppercase text-gray-500 tracking-wider">{t('cust.app.surname', { defaultValue: 'Surname' })}</label>
                 <input
                   id="sf-surname"
                   value={formData.surname}
                   maxLength={60}
                   onChange={(e) => setFormData({ ...formData, surname: e.target.value })}
                   className="w-full bg-[#F7F7F5] border notion-border rounded-md px-3 py-2.5 focus:outline-none focus:ring-1 focus:ring-gray-400 placeholder-gray-400"
-                  placeholder="Doe"
+                  placeholder={t('cust.app.surnamePh', { defaultValue: 'Doe' })}
                 />
               </div>
             </div>
             <div className="space-y-1">
-              <label htmlFor="sf-email" className="text-[11px] font-bold uppercase text-gray-500 tracking-wider">Email Address</label>
+              <label htmlFor="sf-email" className="text-[11px] font-bold uppercase text-gray-500 tracking-wider">{t('cust.app.emailAddress', { defaultValue: 'Email Address' })}</label>
               <input
                 id="sf-email"
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 className="w-full bg-[#F7F7F5] border notion-border rounded-md px-3 py-2.5 focus:outline-none focus:ring-1 focus:ring-gray-400 placeholder-gray-400"
-                placeholder="jane@example.com"
+                placeholder={t('cust.app.emailPh', { defaultValue: 'jane@example.com' })}
               />
             </div>
             <div className="space-y-1">
-              <label htmlFor="sf-phone" className="text-[11px] font-bold uppercase text-gray-500 tracking-wider">Phone Number <span className="font-normal normal-case text-gray-400">(optional)</span></label>
+              <label htmlFor="sf-phone" className="text-[11px] font-bold uppercase text-gray-500 tracking-wider">{t('cust.app.phoneNumber', { defaultValue: 'Phone Number' })} <span className="font-normal normal-case text-gray-400">{t('cust.app.optional', { defaultValue: '(optional)' })}</span></label>
               <PhoneField id="sf-phone" onChange={(v) => setFormData({ ...formData, phone: v })} />
               <p className="text-[11px] text-gray-500 leading-relaxed">
-                Recommended so {campaign.businessName} can reach you about your rewards and reach your card if you lose access to your email.
+                {t('cust.app.phoneHint', { name: campaign.businessName, defaultValue: 'Recommended so {{name}} can reach you about your rewards and reach your card if you lose access to your email.' })}
               </p>
             </div>
             <div className="space-y-1">
-              <label htmlFor="sf-code" className="text-[11px] font-bold uppercase text-gray-500 tracking-wider">Card recovery code (6 digits)</label>
+              <label htmlFor="sf-code" className="text-[11px] font-bold uppercase text-gray-500 tracking-wider">{t('cust.app.recoveryCode', { defaultValue: 'Card recovery code (6 digits)' })}</label>
               <input
                 id="sf-code"
                 type="text" inputMode="numeric" maxLength={6}
@@ -368,7 +369,7 @@ export function CustomerApp({ campaignId, joinedLocationId, onExit }: CustomerAp
               />
               <div className="flex items-start gap-2 bg-blue-50 border border-blue-200 rounded-md px-3 py-2 text-[11px] text-blue-700 leading-relaxed">
                 <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
-                <span>Keep this recovery code safe. If you added a phone number, the two together let you recover your card &mdash; either way you can always sign back in with your email.</span>
+                <span>{t('cust.app.codeInfo', { defaultValue: 'Keep this recovery code safe. If you added a phone number, the two together let you recover your card — either way you can always sign back in with your email.' })}</span>
               </div>
             </div>
 
@@ -386,19 +387,19 @@ export function CustomerApp({ campaignId, joinedLocationId, onExit }: CustomerAp
                   className="mt-0.5 w-4 h-4 accent-[#37352F] flex-shrink-0"
                 />
                 <span className="text-xs text-gray-600 leading-relaxed">
-                  I agree to {campaign.businessName}'s{' '}
+                  {t('cust.app.agreeA', { defaultValue: 'I agree to' })}{' '}
                   <button
                     type="button"
                     onClick={(e) => { e.preventDefault(); setShowPrivacyNotice(true); }}
                     className="underline text-[#37352F] font-medium"
                   >
-                    privacy notice
+                    {t('cust.app.privacyNoticeLink', { name: campaign.businessName, defaultValue: "{{name}}'s privacy notice" })}
                   </button>
-                  {' '}and{' '}
+                  {' '}{t('cust.app.agreeAnd', { defaultValue: 'and' })}{' '}
                   <a href="/terms" target="_blank" rel="noreferrer" className="underline text-[#37352F] font-medium">
-                    Stampfix's terms
+                    {t('cust.app.termsLink', { defaultValue: "Stampfix's terms" })}
                   </a>
-                  .
+                  {t('cust.app.agreeEnd', { defaultValue: '.' })}
                 </span>
               </label>
               <label className="flex items-start gap-2.5 cursor-pointer group">
@@ -409,7 +410,7 @@ export function CustomerApp({ campaignId, joinedLocationId, onExit }: CustomerAp
                   className="mt-0.5 w-4 h-4 accent-[#37352F] flex-shrink-0"
                 />
                 <span className="text-xs text-gray-500 leading-relaxed">
-                  Send me marketing emails from {campaign.businessName} (optional).
+                  {t('cust.app.marketing', { name: campaign.businessName, defaultValue: 'Send me marketing emails from {{name}} (optional).' })}
                 </span>
               </label>
             </div>
@@ -425,11 +426,11 @@ export function CustomerApp({ campaignId, joinedLocationId, onExit }: CustomerAp
               className="w-full bg-[#37352F] text-white py-3 rounded-md font-medium hover:bg-opacity-90 transition disabled:opacity-50 shadow-sm flex items-center justify-center gap-2 mt-2"
             >
               {isSendingLink ? <Loader2 className="w-4 h-4 animate-spin" /> : (
-                <>Join now <ArrowRight className="w-4 h-4" /></>
+                <>{t('cust.app.joinNow', { defaultValue: 'Join now' })} <ArrowRight className="w-4 h-4" /></>
               )}
             </button>
             <p className="text-[10px] text-gray-500 text-center">
-              No password needed — you'll get your card right away.
+              {t('cust.app.noPassword', { defaultValue: "No password needed — you'll get your card right away." })}
             </p>
           </div>
         </div>
@@ -439,15 +440,15 @@ export function CustomerApp({ campaignId, joinedLocationId, onExit }: CustomerAp
           <div className="fixed inset-0 bg-black/40 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={() => setShowPrivacyNotice(false)}>
             <div className="bg-white rounded-t-xl sm:rounded-xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
               <div className="sticky top-0 bg-white border-b notion-border px-5 py-3 flex items-center justify-between">
-                <h3 className="font-semibold">{campaign.businessName} — Privacy notice</h3>
-                <button onClick={() => setShowPrivacyNotice(false)} aria-label="Close" className="text-gray-500 hover:text-[#37352F] text-xl leading-none"><span aria-hidden="true">&times;</span></button>
+                <h3 className="font-semibold">{campaign.businessName} — {t('cust.app.privacyNoticeTitle', { defaultValue: 'Privacy notice' })}</h3>
+                <button onClick={() => setShowPrivacyNotice(false)} aria-label={t('cust.app.close', { defaultValue: 'Close' })} className="text-gray-500 hover:text-[#37352F] text-xl leading-none"><span aria-hidden="true">&times;</span></button>
               </div>
               <div className="px-5 py-4 text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
                 {campaign.customerPrivacyNotice ?? (
                   <>
-                    <p>{campaign.businessName} collects your name and email to operate their loyalty program. They use this information solely for the purpose of tracking your stamps, sending reward notifications, and (with your consent) sending marketing communications.</p>
-                    <p className="mt-3">{campaign.businessName} has not yet published a custom privacy notice. For Stampfix's general data handling practices, see our <a href="/privacy" className="underline">platform privacy policy</a>.</p>
-                    <p className="mt-3">You can request deletion of your data at any time from the "My Card" page.</p>
+                    <p>{t('cust.app.genericP1', { name: campaign.businessName, defaultValue: '{{name}} collects your name and email to operate their loyalty program. They use this information solely for the purpose of tracking your stamps, sending reward notifications, and (with your consent) sending marketing communications.' })}</p>
+                    <p className="mt-3">{t('cust.app.genericP2a', { name: campaign.businessName, defaultValue: "{{name}} has not yet published a custom privacy notice. For Stampfix's general data handling practices, see our" })} <a href="/privacy" className="underline">{t('cust.app.genericP2link', { defaultValue: 'platform privacy policy' })}</a>.</p>
+                    <p className="mt-3">{t('cust.app.genericP3', { defaultValue: 'You can request deletion of your data at any time from the "My Card" page.' })}</p>
                   </>
                 )}
               </div>
@@ -479,16 +480,16 @@ export function CustomerApp({ campaignId, joinedLocationId, onExit }: CustomerAp
           <span>{campaign.businessName}</span>
         </div>
         <button onClick={handleSignOut} className="text-xs text-gray-500 hover:text-red-500 transition flex items-center gap-1">
-          <LogOut className="w-3 h-3" /> Sign out
+          <LogOut className="w-3 h-3" /> {t('cust.app.signOut', { defaultValue: 'Sign out' })}
         </button>
       </header>
 
       <main className="flex-1 flex flex-col items-center justify-start pt-12 p-6 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20 overflow-y-auto">
         {showWelcome && <WelcomeModal onDismiss={dismissWelcome} />}
         <div className="text-center mb-8 space-y-2">
-          <h1 className="text-3xl font-serif-display font-semibold">Your Digital Card</h1>
+          <h1 className="text-3xl font-serif-display font-semibold">{t('cust.app.yourDigitalCard', { defaultValue: 'Your Digital Card' })}</h1>
           <p className="text-gray-500 text-sm max-w-xs mx-auto">
-            Save your card to your phone's wallet for quick access.
+            {t('cust.app.saveToWallet', { defaultValue: "Save your card to your phone's wallet for quick access." })}
           </p>
         </div>
 
@@ -503,25 +504,25 @@ export function CustomerApp({ campaignId, joinedLocationId, onExit }: CustomerAp
         <div className="mt-8 grid grid-cols-2 gap-4 w-full max-w-[340px] text-center">
           <div className="bg-white p-4 rounded-lg border notion-border shadow-sm">
             <div className="font-bold text-2xl mb-1 text-[#37352F]">{card.currentStamps}</div>
-            <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Stamps</div>
+            <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">{t('cust.app.stamps', { defaultValue: 'Stamps' })}</div>
           </div>
           <div className="bg-white p-4 rounded-lg border notion-border shadow-sm">
             <div className="font-bold text-2xl mb-1 text-[#37352F]">{campaign.maxStamps - card.currentStamps}</div>
-            <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">To Go</div>
+            <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">{t('cust.app.toGo', { defaultValue: 'To Go' })}</div>
           </div>
         </div>
 
         <div className="mt-8 text-center max-w-xs">
-          <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-2">Instructions</p>
+          <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-2">{t('cust.app.instructions', { defaultValue: 'Instructions' })}</p>
           <p className="text-xs text-gray-500">
-            Present the QR code on your card to the cashier at <strong>{campaign.businessName}</strong> to collect stamps and redeem rewards.
+            {t('cust.app.instructionsA', { defaultValue: 'Present the QR code on your card to the cashier at' })} <strong>{campaign.businessName}</strong> {t('cust.app.instructionsB', { defaultValue: 'to collect stamps and redeem rewards.' })}
           </p>
         </div>
 
         <div className="mt-6 max-w-xs w-full bg-[#F7F7F5] border notion-border rounded-lg p-3 text-center">
-          <p className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-1.5">Coming back later?</p>
+          <p className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-1.5">{t('cust.app.comingBack', { defaultValue: 'Coming back later?' })}</p>
           <p className="text-xs text-gray-600 leading-relaxed">
-            Visit <a href="/my-card" className="text-[#37352F] font-medium underline">stampfix.app/my-card</a> and enter this same email to find your card again.
+            {t('cust.app.comingBackA', { defaultValue: 'Visit' })} <a href="/my-card" className="text-[#37352F] font-medium underline">stampfix.app/my-card</a> {t('cust.app.comingBackB', { defaultValue: 'and enter this same email to find your card again.' })}
           </p>
         </div>
       </main>

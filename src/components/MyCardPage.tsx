@@ -11,6 +11,7 @@ import { verifyTurnstile } from '../services/turnstile';
 import { DownloadMyDataButton } from './DownloadMyDataButton';
 import { AddToAppleWalletButton } from './AddToAppleWalletButton';
 import { Logo } from './Logo';
+import { LanguageSwitcher } from './LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -465,6 +466,8 @@ function Shell({
             <Logo className="h-6 w-auto text-[#37352F]" />
             <span className="font-semibold">Stampfix</span>
           </button>
+          <div className="flex items-center gap-1">
+          <LanguageSwitcher />
           {onSignOut ? (
             <button
               onClick={onSignOut}
@@ -480,6 +483,7 @@ function Shell({
               <ArrowLeft className="w-3 h-3" /> {t('cust.mycard.home', { defaultValue: 'Home' })}
             </button>
           )}
+          </div>
         </div>
       </header>
       <main className="max-w-md mx-auto px-5 py-6">

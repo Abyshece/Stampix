@@ -11,6 +11,7 @@ import { AddToAppleWalletButton } from './AddToAppleWalletButton';
 import { Turnstile } from './Turnstile';
 import { verifyTurnstile } from '../services/turnstile';
 import { logConsent, CONSENT_VERSIONS } from '../lib/consent';
+import { LanguageSwitcher } from './LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
 
 interface CustomerAppProps {
@@ -305,6 +306,7 @@ export function CustomerApp({ campaignId, joinedLocationId, onExit }: CustomerAp
         <button onClick={onExit} aria-label={t('cust.app.goBack', { defaultValue: 'Go back' })} className="absolute top-6 left-6 text-gray-500 hover:text-gray-600">
           <ArrowLeft className="w-5 h-5" aria-hidden="true" />
         </button>
+        <div className="absolute top-4 right-4"><LanguageSwitcher /></div>
         <div className="max-w-sm w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="text-center space-y-2">
             <div className="w-12 h-12 bg-[#F7F7F5] rounded-md mx-auto flex items-center justify-center text-xl border notion-border mb-4">
@@ -479,9 +481,12 @@ export function CustomerApp({ campaignId, joinedLocationId, onExit }: CustomerAp
           </div>
           <span>{campaign.businessName}</span>
         </div>
-        <button onClick={handleSignOut} className="text-xs text-gray-500 hover:text-red-500 transition flex items-center gap-1">
-          <LogOut className="w-3 h-3" /> {t('cust.app.signOut', { defaultValue: 'Sign out' })}
-        </button>
+        <div className="flex items-center gap-1">
+          <LanguageSwitcher />
+          <button onClick={handleSignOut} className="text-xs text-gray-500 hover:text-red-500 transition flex items-center gap-1">
+            <LogOut className="w-3 h-3" /> {t('cust.app.signOut', { defaultValue: 'Sign out' })}
+          </button>
+        </div>
       </header>
 
       <main className="flex-1 flex flex-col items-center justify-start pt-12 p-6 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20 overflow-y-auto">

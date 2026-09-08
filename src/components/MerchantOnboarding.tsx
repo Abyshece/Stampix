@@ -8,6 +8,7 @@ import { supabase } from '../lib/supabase';
 import { Turnstile } from './Turnstile';
 import { verifyTurnstile } from '../services/turnstile';
 import { logConsent, CONSENT_VERSIONS } from '../lib/consent';
+import { useTranslation } from 'react-i18next';
 
 const NOTION_COLORS = [
   { name: 'Default', hex: '#37352F' },
@@ -48,6 +49,7 @@ interface OnboardingProps {
  * insert). Otherwise we create immediately.
  */
 export function MerchantOnboarding({ onComplete, initialStep = 'FORM', onBack }: OnboardingProps) {
+  const { t } = useTranslation();
   const [step, setStep] = useState<'FORM' | 'CHECK_EMAIL' | 'LOGIN' | 'THANK_YOU' | 'FINISH'>(() => {
     // Survive the remount caused by signing out right after signup, so the
     // thank-you screen shows instead of bouncing back to the empty form.
@@ -124,11 +126,11 @@ export function MerchantOnboarding({ onComplete, initialStep = 'FORM', onBack }:
     setError(null);
     if (!busName || !email || !password || !country) return;
     if (!termsAccepted || !privacyAccepted || !dpaAccepted) {
-      setError('Please accept the Terms, Privacy Policy, and Data Processing Agreement to continue.');
+      setError(t('dash.signup.errAcceptAll', { defaultValue: 'Please accept the Terms, Privacy Policy, and Data Processing Agreement to continue.' }));
       return;
     }
     if (!turnstileToken) {
-      setError('Please complete the security check.');
+      setError(t('dash.signup.errSecurity', { defaultValue: 'Please complete the security check.' }));
       return;
     }
     setLoading(true);
@@ -138,7 +140,7 @@ export function MerchantOnboarding({ onComplete, initialStep = 'FORM', onBack }:
       // aren't blocked by a Cloudflare outage.
       const ok = await verifyTurnstile(turnstileToken);
       if (!ok) {
-        setError('Security check failed. Please try again.');
+        setError(t('dash.signup.errSecurityFailed', { defaultValue: 'Security check failed. Please try again.' }));
         setTurnstileToken(null);
         setLoading(false);
         return;
@@ -181,7 +183,7 @@ export function MerchantOnboarding({ onComplete, initialStep = 'FORM', onBack }:
         setStep('THANK_YOU');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Signup failed');
+      setError(err instanceof Error ? err.message : t('dash.signup.errSignup', { defaultValue: 'Signup failed' }));
     } finally {
       setLoading(false);
     }
@@ -202,7 +204,7 @@ export function MerchantOnboarding({ onComplete, initialStep = 'FORM', onBack }:
       clearRegFlags();
       onComplete();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
+      setError(err instanceof Error ? err.message : t('dash.signup.errLogin', { defaultValue: 'Login failed' }));
     } finally {
       setLoading(false);
     }
@@ -216,21 +218,21 @@ export function MerchantOnboarding({ onComplete, initialStep = 'FORM', onBack }:
           <div className="w-16 h-16 bg-blue-50 rounded-full mx-auto flex items-center justify-center text-blue-600 border border-blue-100">
             <Info className="w-8 h-8" />
           </div>
-          <h1 className="text-3xl font-serif-display font-semibold">Thank you for registering!</h1>
+          <h1 className="text-3xl font-serif-display font-semibold">{t('dash.signup.thankYou', { defaultValue: 'Thank you for registering!' })}</h1>
           <p className="text-gray-500 leading-relaxed">
-            Your business <strong className="text-[#37352F]">{busName || 'account'}</strong> has been registered.
+            {t('dash.signup.tyBusiness', { defaultValue: 'Your business' })} <strong className="text-[#37352F]">{busName || t('dash.signup.account', { defaultValue: 'account' })}</strong> {t('dash.signup.tyRegistered', { defaultValue: 'has been registered.' })}
           </p>
           <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 text-sm text-blue-800 text-left flex items-start gap-2.5">
             <Info className="w-5 h-5 flex-shrink-0 mt-0.5" />
             <span>
-              Please give us <strong>24 hours</strong> while we review your request. You can sign in now and start setting things up — you'll see your approval status on the dashboard.
+              {t('dash.signup.review24a', { defaultValue: 'Please give us' })} <strong>{t('dash.signup.hours24', { defaultValue: '24 hours' })}</strong> {t('dash.signup.review24b', { defaultValue: "while we review your request. You can sign in now and start setting things up — you'll see your approval status on the dashboard." })}
             </span>
           </div>
           <button
             onClick={() => { clearRegFlags(); handleSwitchToLogin(); }}
             className="w-full bg-[#37352F] text-white py-3 rounded-md font-medium hover:bg-opacity-90 transition"
           >
-            Sign in
+            {t('dash.signup.signIn', { defaultValue: 'Sign in' })}
           </button>
         </div>
       </div>
@@ -245,20 +247,18 @@ export function MerchantOnboarding({ onComplete, initialStep = 'FORM', onBack }:
           <div className="w-16 h-16 bg-blue-50 rounded-full mx-auto flex items-center justify-center text-blue-600 border border-blue-100">
             <Mail className="w-8 h-8" />
           </div>
-          <h1 className="text-3xl font-serif-display font-semibold">Check your email</h1>
+          <h1 className="text-3xl font-serif-display font-semibold">{t('dash.signup.checkEmail', { defaultValue: 'Check your email' })}</h1>
           <p className="text-gray-500 leading-relaxed">
-            We sent a confirmation link to <strong className="text-[#37352F]">{email}</strong>.
-            Click it to activate your workspace, then come back here and sign in.
+            {t('dash.signup.sentLinkA', { defaultValue: 'We sent a confirmation link to' })} <strong className="text-[#37352F]">{email}</strong>{t('dash.signup.sentLinkB', { defaultValue: '. Click it to activate your workspace, then come back here and sign in.' })}
           </p>
           <div className="bg-[#F7F7F5] border notion-border rounded-lg p-4 text-xs text-gray-500 text-left">
-            <strong>Heads up:</strong> Your workspace ({busName}) will be set up
-            automatically the first time you sign in after confirming — you'll set your reward in the next step.
+            <strong>{t('dash.signup.headsUp', { defaultValue: 'Heads up:' })}</strong> {t('dash.signup.workspaceSetup', { name: busName, defaultValue: "Your workspace ({{name}}) will be set up automatically the first time you sign in after confirming — you'll set your reward in the next step." })}
           </div>
           <button
             onClick={handleSwitchToLogin}
             className="w-full bg-[#37352F] text-white py-3 rounded-md font-medium hover:bg-opacity-90 transition"
           >
-            I've confirmed - sign me in
+            {t('dash.signup.confirmedSignIn', { defaultValue: "I've confirmed - sign me in" })}
           </button>
         </div>
       </div>
@@ -271,12 +271,12 @@ export function MerchantOnboarding({ onComplete, initialStep = 'FORM', onBack }:
       <div className="min-h-screen bg-white flex items-center justify-center p-6 text-[#37352F]">
         <div className="max-w-md w-full space-y-6">
           <div className="text-center space-y-2">
-            <h1 className="text-3xl font-serif-display font-semibold">Sign in</h1>
-            <p className="text-gray-500 text-sm">Enter the credentials you just created.</p>
+            <h1 className="text-3xl font-serif-display font-semibold">{t('dash.signup.signIn', { defaultValue: 'Sign in' })}</h1>
+            <p className="text-gray-500 text-sm">{t('dash.signup.loginSub', { defaultValue: 'Enter the credentials you just created.' })}</p>
           </div>
           <form onSubmit={handleLoginSubmit} className="space-y-4">
             <div className="space-y-1">
-              <label className="text-xs font-bold uppercase text-gray-400 tracking-wider">Email</label>
+              <label className="text-xs font-bold uppercase text-gray-400 tracking-wider">{t('dash.signup.email', { defaultValue: 'Email' })}</label>
               <input
                 type="email"
                 value={email}
@@ -285,7 +285,7 @@ export function MerchantOnboarding({ onComplete, initialStep = 'FORM', onBack }:
               />
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-bold uppercase text-gray-400 tracking-wider">Password</label>
+              <label className="text-xs font-bold uppercase text-gray-400 tracking-wider">{t('dash.signup.password', { defaultValue: 'Password' })}</label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -297,7 +297,7 @@ export function MerchantOnboarding({ onComplete, initialStep = 'FORM', onBack }:
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showPassword ? t('dash.signup.hidePassword', { defaultValue: 'Hide password' }) : t('dash.signup.showPassword', { defaultValue: 'Show password' })}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -311,14 +311,14 @@ export function MerchantOnboarding({ onComplete, initialStep = 'FORM', onBack }:
               disabled={loading}
               className="w-full bg-[#37352F] text-white py-3 rounded-md font-medium hover:bg-opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Sign In'}
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : t('dash.signup.signInBtn', { defaultValue: 'Sign In' })}
             </button>
           </form>
           <button
             onClick={() => { clearRegFlags(); setStep('FORM'); }}
             className="w-full text-xs text-gray-500 hover:text-[#37352F] flex items-center justify-center gap-1"
           >
-            <ArrowLeft className="w-3 h-3" /> Back to signup
+            <ArrowLeft className="w-3 h-3" /> {t('dash.signup.backToSignup', { defaultValue: 'Back to signup' })}
           </button>
         </div>
       </div>
@@ -334,7 +334,7 @@ export function MerchantOnboarding({ onComplete, initialStep = 'FORM', onBack }:
             onClick={onBack}
             className="mb-6 text-sm text-gray-500 hover:text-[#37352F] flex items-center gap-1 transition"
           >
-            <ArrowLeft className="w-4 h-4" /> Back to home
+            <ArrowLeft className="w-4 h-4" /> {t('dash.signup.backHome', { defaultValue: 'Back to home' })}
           </button>
         )}
         <div className="mb-10 text-center">
@@ -342,48 +342,48 @@ export function MerchantOnboarding({ onComplete, initialStep = 'FORM', onBack }:
             <svg viewBox="0 0 282 90" className="h-11 w-auto" fill="currentColor" role="img" aria-label="Stampfix"><rect x="8" y="12" width="66" height="66" rx="4"/><circle cx="140" cy="45" r="34"/><rect x="195" y="36" width="90" height="18" rx="9" transform="rotate(45 240 45)"/><rect x="195" y="36" width="90" height="18" rx="9" transform="rotate(-45 240 45)"/></svg>
           </div>
           <div className="h-1.5 w-16 rounded-full mx-auto mb-4" style={{ background: 'linear-gradient(90deg,#75FBFD,#1132F5,#510AF5,#EA33B6,#EA3323,#F0A479,#F7CE46,#75FBFD)' }} />
-          <h2 className="text-3xl font-serif-display font-semibold mb-2">Create your workspace</h2>
-          <p className="text-gray-500">Set up your business&rsquo;s loyalty program in under a minute.</p>
+          <h2 className="text-3xl font-serif-display font-semibold mb-2">{t('dash.signup.createWorkspace', { defaultValue: 'Create your workspace' })}</h2>
+          <p className="text-gray-500">{t('dash.signup.createSub', { defaultValue: "Set up your business's loyalty program in under a minute." })}</p>
         </div>
 
         <div className="bg-white rounded-lg p-8 shadow-sm border notion-border space-y-8">
           {/* Account */}
           <div className="space-y-4">
-            <h3 className="text-xs font-bold uppercase text-gray-400 tracking-wider border-b notion-border pb-2">Account Details</h3>
+            <h3 className="text-xs font-bold uppercase text-gray-400 tracking-wider border-b notion-border pb-2">{t('dash.signup.accountDetails', { defaultValue: 'Account Details' })}</h3>
             <div className="space-y-1">
-              <label className="text-sm font-medium">Email Address</label>
+              <label className="text-sm font-medium">{t('dash.signup.emailAddress', { defaultValue: 'Email Address' })}</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-[#F7F7F5] border-b notion-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300"
-                placeholder="merchant@example.com"
+                placeholder={t('dash.signup.emailPh', { defaultValue: 'merchant@example.com' })}
               />
             </div>
             <div className="space-y-1">
               <label className="text-sm font-medium">
-                Phone Number <span className="text-gray-400 font-normal">(optional)</span>
+                {t('dash.signup.phoneNumber', { defaultValue: 'Phone Number' })} <span className="text-gray-400 font-normal">{t('dash.signup.optional', { defaultValue: '(optional)' })}</span>
               </label>
               <PhoneField onChange={setPhone} />
               <p className="text-xs text-gray-500">
-                Strongly recommended — it's how we reach you fast for account recovery and any urgent issue affecting your loyalty program.
+                {t('dash.signup.phoneHint', { defaultValue: "Strongly recommended — it's how we reach you fast for account recovery and any urgent issue affecting your loyalty program." })}
               </p>
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium">Password</label>
+              <label className="text-sm font-medium">{t('dash.signup.password', { defaultValue: 'Password' })}</label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-[#F7F7F5] border-b notion-border rounded px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300"
-                  placeholder="At least 6 characters"
+                  placeholder={t('dash.signup.passwordPh', { defaultValue: 'At least 6 characters' })}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
                   className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showPassword ? t('dash.signup.hidePassword', { defaultValue: 'Hide password' }) : t('dash.signup.showPassword', { defaultValue: 'Show password' })}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -393,48 +393,48 @@ export function MerchantOnboarding({ onComplete, initialStep = 'FORM', onBack }:
 
           {/* Business */}
           <div className="space-y-4">
-            <h3 className="text-xs font-bold uppercase text-gray-400 tracking-wider border-b notion-border pb-2">Business Details</h3>
+            <h3 className="text-xs font-bold uppercase text-gray-400 tracking-wider border-b notion-border pb-2">{t('dash.signup.businessDetails', { defaultValue: 'Business Details' })}</h3>
             <div className="space-y-1">
-              <label className="text-sm font-medium">Business Name</label>
+              <label className="text-sm font-medium">{t('dash.signup.businessName', { defaultValue: 'Business Name' })}</label>
               <input
                 value={busName}
                 maxLength={60}
                 onChange={(e) => setBusName(e.target.value)}
                 className="w-full bg-[#F7F7F5] border-b notion-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300"
-                placeholder="e.g. Bella's Salon"
+                placeholder={t('dash.signup.businessNamePh', { defaultValue: "e.g. Bella's Salon" })}
               />
             </div>
             <div className="space-y-1">
               <label className="text-sm font-medium flex items-center gap-1.5">
-                Primary location
-                <span className="text-[10px] text-gray-400 font-normal uppercase tracking-wider">Optional</span>
+                {t('dash.signup.primaryLocation', { defaultValue: 'Primary location' })}
+                <span className="text-[10px] text-gray-400 font-normal uppercase tracking-wider">{t('dash.signup.optionalUpper', { defaultValue: 'Optional' })}</span>
               </label>
               <input
                 value={primaryLocationName}
                 onChange={(e) => setPrimaryLocationName(e.target.value)}
                 className="w-full bg-[#F7F7F5] border-b notion-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300"
-                placeholder={busName || 'e.g. Downtown branch, or just your shop name'}
+                placeholder={busName || t('dash.signup.locPh', { defaultValue: 'e.g. Downtown branch, or just your shop name' })}
               />
-              <p className="text-[11px] text-gray-400">If you have multiple branches with the same name, name this one (e.g. "Downtown"). You can add more locations later in Settings.</p>
+              <p className="text-[11px] text-gray-400">{t('dash.signup.locHint', { defaultValue: 'If you have multiple branches with the same name, name this one (e.g. "Downtown"). You can add more locations later in Settings.' })}</p>
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium">Country</label>
+              <label className="text-sm font-medium">{t('dash.signup.country', { defaultValue: 'Country' })}</label>
               <div className="pt-1">
                 <CountrySelect value={country} onChange={setCountry} />
               </div>
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium">Logo Text</label>
+              <label className="text-sm font-medium">{t('dash.signup.logoText', { defaultValue: 'Logo Text' })}</label>
               <input
                 value={logoText}
                 onChange={(e) => setLogoText(e.target.value)}
                 className="w-full bg-[#F7F7F5] border-b notion-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300"
-                placeholder="ACME"
+                placeholder={t('dash.signup.logoTextPh', { defaultValue: 'ACME' })}
                 maxLength={10}
               />
               <div className="flex gap-2 items-start text-[11px] text-blue-800 bg-blue-50 border border-blue-200 rounded-md p-2 mt-1.5">
                 <Info className="w-3.5 h-3.5 shrink-0 mt-0.5 text-blue-500" />
-                <span>This short text shows at the very top of your card &mdash; next to your logo &mdash; in both Apple Wallet and Google Wallet.</span>
+                <span>{t('dash.signup.logoInfo', { defaultValue: 'This short text shows at the very top of your card — next to your logo — in both Apple Wallet and Google Wallet.' })}</span>
               </div>
             </div>
           </div>
@@ -451,7 +451,7 @@ export function MerchantOnboarding({ onComplete, initialStep = 'FORM', onBack }:
               marketing is genuinely optional. */}
           <div className="space-y-2.5 pt-2">
             <div className="flex justify-between items-center">
-              <span className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Legal</span>
+              <span className="text-[10px] uppercase tracking-widest font-bold text-gray-400">{t('dash.signup.legal', { defaultValue: 'Legal' })}</span>
               <button
                 type="button"
                 onClick={() => {
@@ -462,34 +462,34 @@ export function MerchantOnboarding({ onComplete, initialStep = 'FORM', onBack }:
                 }}
                 className="text-[11px] text-gray-500 underline hover:text-[#37352F]"
               >
-                {termsAccepted && privacyAccepted && dpaAccepted ? 'Uncheck all' : 'Accept all required'}
+                {termsAccepted && privacyAccepted && dpaAccepted ? t('dash.signup.uncheckAll', { defaultValue: 'Uncheck all' }) : t('dash.signup.acceptAllRequired', { defaultValue: 'Accept all required' })}
               </button>
             </div>
             <ConsentCheckbox
               checked={termsAccepted}
               onChange={setTermsAccepted}
               required
-              label={<>I agree to the <a href="/terms" target="_blank" className="underline">Terms of Service</a>.</>}
+              label={<>{t('dash.signup.termsA', { defaultValue: 'I agree to the' })} <a href="/terms" target="_blank" className="underline">{t('dash.signup.termsLink', { defaultValue: 'Terms of Service' })}</a>{t('dash.signup.termsEnd', { defaultValue: '.' })}</>}
             />
             <ConsentCheckbox
               checked={privacyAccepted}
               onChange={setPrivacyAccepted}
               required
-              label={<>I've read the <a href="/privacy" target="_blank" className="underline">Privacy Policy</a>.</>}
+              label={<>{t('dash.signup.privacyA', { defaultValue: "I've read the" })} <a href="/privacy" target="_blank" className="underline">{t('dash.signup.privacyLink', { defaultValue: 'Privacy Policy' })}</a>{t('dash.signup.privacyEnd', { defaultValue: '.' })}</>}
             />
             <ConsentCheckbox
               checked={dpaAccepted}
               onChange={setDpaAccepted}
               required
               label={
-                <>I accept the <a href="/dpa" target="_blank" className="underline">Data Processing Agreement</a>
-                {country === 'DE' && <span className="text-gray-500"> (required for GDPR compliance)</span>}.</>
+                <>{t('dash.signup.dpaA', { defaultValue: 'I accept the' })} <a href="/dpa" target="_blank" className="underline">{t('dash.signup.dpaLink', { defaultValue: 'Data Processing Agreement' })}</a>
+                {country === 'DE' && <span className="text-gray-500">{t('dash.signup.gdprNote', { defaultValue: ' (required for GDPR compliance)' })}</span>}{t('dash.signup.dpaEnd', { defaultValue: '.' })}</>
               }
             />
             <ConsentCheckbox
               checked={marketingOptIn}
               onChange={setMarketingOptIn}
-              label={<span className="text-gray-500">Send me product updates and tips by email (optional).</span>}
+              label={<span className="text-gray-500">{t('dash.signup.marketing', { defaultValue: 'Send me product updates and tips by email (optional).' })}</span>}
             />
           </div>
 
@@ -507,7 +507,7 @@ export function MerchantOnboarding({ onComplete, initialStep = 'FORM', onBack }:
             className="w-full bg-[#37352F] text-white py-3 rounded hover:bg-opacity-90 transition font-medium disabled:opacity-50 shadow-sm flex items-center justify-center gap-2"
           >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
-              <>Create Workspace <ArrowRight className="w-4 h-4" /></>
+              <>{t('dash.signup.createWorkspaceBtn', { defaultValue: 'Create Workspace' })} <ArrowRight className="w-4 h-4" /></>
             )}
           </button>
 
@@ -516,7 +516,7 @@ export function MerchantOnboarding({ onComplete, initialStep = 'FORM', onBack }:
               onClick={handleSwitchToLogin}
               className="text-sm text-gray-500 hover:text-[#37352F] transition-colors"
             >
-              Already have an account? <span className="text-[#37352F] font-medium border-b border-gray-300">Sign in</span>
+              {t('dash.signup.haveAccount', { defaultValue: 'Already have an account?' })} <span className="text-[#37352F] font-medium border-b border-gray-300">{t('dash.signup.signIn', { defaultValue: 'Sign in' })}</span>
             </button>
           </div>
         </div>

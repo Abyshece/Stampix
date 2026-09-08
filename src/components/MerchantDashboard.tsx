@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 import { NotificationBell } from './NotificationBell';
+import { LanguageSwitcher } from './LanguageSwitcher';
 import { SupportModal } from './SupportModal';
 import { markApprovalBannerSeen, getCardById, logMerchantActivity } from '../lib/db';
 import { useTranslation } from 'react-i18next';
@@ -882,6 +883,7 @@ export function MerchantDashboard({
                 <p className="text-[11px] md:text-xs text-gray-400 truncate">{t('dash.scan.loggedInAs', { defaultValue: 'You are logged in as' })} {user?.email ?? '—'}</p>
               </div>
               <div className="flex items-center gap-2 flex-wrap w-full md:w-auto">
+              <LanguageSwitcher />
               <NotificationBell />
               {staffRoster.length > 0 && (
                 <div className="flex items-center gap-1.5 bg-white border notion-border rounded-md px-2.5 py-1.5 shadow-sm">

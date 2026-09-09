@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Smartphone, Zap, Globe, BarChart3, Palette, Building2, Users, Wallet, FileDown, Gauge, Link2, MapPin, BellRing, ShieldCheck, Printer, LifeBuoy, Sparkles, TrendingUp } from 'lucide-react';
 import { useInView } from './FeatureVisuals';
 import { WalletPass } from './HeroCardLoop';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Features section for the marketing site. Two-column on desktop:
@@ -16,6 +17,7 @@ import { WalletPass } from './HeroCardLoop';
 export function FeaturesSection() {
   // Each feature gets a colour chip drawn from the wallet-card palette, so the
   // list reads as colourful as the cards themselves.
+  const { t } = useTranslation();
   const features = [
     { icon: Smartphone,  c: '#75FBFD', fg: '#1A1A1A', anim: 'sf-fl', text: 'No extra scanner hardware — your phone is the terminal' },
     { icon: Zap,         c: '#EA3323', fg: '#FFFFFF', anim: 'sf-pu', text: 'Set up your first loyalty card in 1–2 minutes' },
@@ -44,10 +46,10 @@ export function FeaturesSection() {
         <div className="text-center mb-10 md:mb-14">
           <span className="text-xs uppercase tracking-widest font-bold text-gray-400">Stampfix Pro</span>
           <h2 className="text-3xl md:text-5xl font-serif-display font-semibold mt-2 mb-4">
-            Everything you get with Pro
+            {t('landing.feat.title', { defaultValue: 'Everything you get with Pro' })}
           </h2>
           <p className="text-gray-500 max-w-xl mx-auto">
-            One flat price — no per-customer fees, no enterprise bloat. Just every tool a café, salon, or shop needs to run loyalty, without the price tag of the big platforms.
+            {t('landing.feat.sub', { defaultValue: 'One flat price — no per-customer fees, no enterprise bloat. Just every tool a café, salon, or shop needs to run loyalty, without the price tag of the big platforms.' })}
           </p>
         </div>
 
@@ -64,7 +66,7 @@ export function FeaturesSection() {
               }}
             />
             <div className="relative rounded-[22px] overflow-hidden border border-gray-200/80 shadow-2xl">
-              <WalletPass spec={{ bg: '#FFFFFF', mark: '#1A1A1A', text: '#000000', name: 'Koko Cafe', reward: 'Buy 6, get 1 free', stamps: 2 }} />
+              <WalletPass spec={{ bg: '#FFFFFF', mark: '#1A1A1A', text: '#000000', name: 'Koko Cafe', reward: t('landing.demoReward', { defaultValue: 'Buy 6, get 1 free' }), stamps: 2 }} />
             </div>
           </div>
         </div>
@@ -84,7 +86,7 @@ export function FeaturesSection() {
               <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm" style={{ background: f.c, color: f.fg }}>
                 <f.icon className={`w-6 h-6 ${f.anim}`} strokeWidth={2.2} style={{ animationDelay: `${(i % 6) * 0.15}s` }} />
               </div>
-              <p className="text-sm md:text-[15px] text-[#37352F] leading-snug">{f.text}</p>
+              <p className="text-sm md:text-[15px] text-[#37352F] leading-snug">{t(`landing.feat.f${i}`, { defaultValue: f.text })}</p>
               {('soon' in f) && (
                 <span className="self-start text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-[#37352F]/10 text-[#37352F]/60">Coming soon</span>
               )}

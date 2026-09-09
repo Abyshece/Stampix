@@ -1,4 +1,5 @@
 import { WalletPass } from './HeroCardLoop';
+import { useTranslation } from 'react-i18next';
 
 /** Stampfix ▪●✕ mark. */
 function Mark({ className, fill = '#37352F' }: { className?: string; fill?: string }) {
@@ -34,7 +35,8 @@ function Tick() {
 
 /** Charcoal device frame around the real wallet card. */
 function DeviceCard({ children }: { children?: React.ReactNode }) {
-  const spec = { bg: '#75FBFD', mark: '#1A1A1A', text: '#223355', name: 'Bloom Coffee', reward: 'Buy 6, get 1 free', stamps: 4 };
+  const { t } = useTranslation();
+  const spec = { bg: '#75FBFD', mark: '#1A1A1A', text: '#223355', name: 'Bloom Coffee', reward: t('landing.demoReward', { defaultValue: 'Buy 6, get 1 free' }), stamps: 4 };
   return (
     <div className="inline-flex flex-col items-center">
       <div className="p-2.5 rounded-[30px] bg-[#37352F] shadow-2xl">
@@ -65,28 +67,30 @@ function VisualDesign() {
 }
 
 function VisualPoster() {
+  const { t } = useTranslation();
   return (
     <div className="w-56 bg-white rounded-xl border notion-border shadow-lg p-6 text-center">
       <Mark className="h-6 w-auto mx-auto" />
       <div className="mt-3 font-serif-display font-semibold text-lg text-[#37352F]">Bloom Coffee</div>
-      <div className="text-xs text-gray-400 mt-1">Scan to collect stamps</div>
+      <div className="text-xs text-gray-400 mt-1">{t('landing.steps.scanToCollect', { defaultValue: 'Scan to collect stamps' })}</div>
       <div className="mt-4 mx-auto w-28 h-28 bg-[#F7F7F5] rounded-lg flex items-center justify-center">
         <QrMini className="w-20 h-20" />
       </div>
-      <div className="mt-4 inline-block bg-[#37352F] text-white text-xs font-semibold px-4 py-2 rounded-full">Buy 6, get 1 free</div>
+      <div className="mt-4 inline-block bg-[#37352F] text-white text-xs font-semibold px-4 py-2 rounded-full">{t('landing.demoReward', { defaultValue: 'Buy 6, get 1 free' })}</div>
     </div>
   );
 }
 
 function VisualWallet() {
+  const { t } = useTranslation();
   return (
     <DeviceCard>
       <div className="flex gap-2 mt-4">
         <div className="bg-black text-white rounded-lg px-3 py-1.5 text-[9px] leading-tight text-center">
-          <div className="opacity-70">Add to</div><div className="font-semibold">Apple Wallet</div>
+          <div className="opacity-70">{t('landing.steps.addTo', { defaultValue: 'Add to' })}</div><div className="font-semibold">Apple Wallet</div>
         </div>
         <div className="bg-black text-white rounded-lg px-3 py-1.5 text-[9px] leading-tight text-center">
-          <div className="opacity-70">Add to</div><div className="font-semibold">Google Wallet</div>
+          <div className="opacity-70">{t('landing.steps.addTo', { defaultValue: 'Add to' })}</div><div className="font-semibold">Google Wallet</div>
         </div>
       </div>
     </DeviceCard>
@@ -94,10 +98,11 @@ function VisualWallet() {
 }
 
 function VisualScan() {
+  const { t } = useTranslation();
   return (
     <div className="w-56 rounded-[30px] bg-[#37352F] p-2.5 shadow-2xl">
       <div className="rounded-[22px] bg-[#F7F7F5] px-6 py-8 text-center">
-        <div className="text-xs font-semibold text-gray-400">John Smith · 2 left</div>
+        <div className="text-xs font-semibold text-gray-400">{t('landing.steps.scanDemo', { defaultValue: 'John Smith · 2 left' })}</div>
         <div className="my-6 mx-auto w-32 h-32 rounded-full bg-[#37352F] flex items-center justify-center text-white text-4xl font-extrabold">+1</div>
         <div className="flex justify-center gap-8">
           <span className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center">
@@ -113,10 +118,11 @@ function VisualScan() {
 }
 
 function VisualDashboard() {
+  const { t } = useTranslation();
   return (
     <div className="w-72 bg-white rounded-xl border-[6px] border-[#37352F] shadow-xl overflow-hidden">
       <div className="bg-[#FAFAF9] p-4">
-        <div className="text-xs font-bold text-[#37352F] mb-3">Insights</div>
+        <div className="text-xs font-bold text-[#37352F] mb-3">{t('landing.steps.insights', { defaultValue: 'Insights' })}</div>
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-white border notion-border rounded-lg p-2 h-28">
             <svg viewBox="0 0 130 90" className="w-full h-full" fill="none">
@@ -175,12 +181,13 @@ const STEPS = [
 ];
 
 export function LaunchSteps() {
+  const { t } = useTranslation();
   return (
     <section className="bg-[#F7F7F5] border-y notion-border py-24">
       <div className="max-w-5xl mx-auto px-6">
         <div className="text-center mb-20">
-          <h2 className="text-3xl md:text-4xl font-serif-display font-semibold mb-4">Launch in 5 steps</h2>
-          <p className="text-gray-500">No developer required.</p>
+          <h2 className="text-3xl md:text-4xl font-serif-display font-semibold mb-4">{t('landing.steps.h2', { defaultValue: 'Launch in 5 steps' })}</h2>
+          <p className="text-gray-500">{t('landing.steps.sub', { defaultValue: 'No developer required.' })}</p>
         </div>
 
         <div className="relative">
@@ -196,13 +203,13 @@ export function LaunchSteps() {
                   <div className={flip ? 'md:order-1' : 'md:order-2'}>
                     <div className="flex items-center gap-3 mb-4">
                       <span className="w-11 h-11 rounded-full bg-[#37352F] text-white font-bold flex items-center justify-center">{s.n}</span>
-                      <span className="text-xs font-bold tracking-[0.2em] text-gray-400">STEP</span>
+                      <span className="text-xs font-bold tracking-[0.2em] text-gray-400">{t('landing.steps.step', { defaultValue: 'STEP' })}</span>
                     </div>
-                    <h3 className="text-2xl md:text-[2rem] font-serif-display font-semibold text-[#37352F] mb-3 leading-tight">{s.title}</h3>
-                    <p className="text-gray-500 leading-relaxed mb-5 max-w-md">{s.desc}</p>
+                    <h3 className="text-2xl md:text-[2rem] font-serif-display font-semibold text-[#37352F] mb-3 leading-tight">{t(`landing.steps.t${i}`, { defaultValue: s.title })}</h3>
+                    <p className="text-gray-500 leading-relaxed mb-5 max-w-md">{t(`landing.steps.d${i}`, { defaultValue: s.desc })}</p>
                     <ul className="space-y-2.5">
-                      {s.bullets.map((b) => (
-                        <li key={b} className="flex items-start gap-3 text-[#37352F] font-medium"><Tick /><span>{b}</span></li>
+                      {s.bullets.map((b, bi) => (
+                        <li key={b} className="flex items-start gap-3 text-[#37352F] font-medium"><Tick /><span>{t(`landing.steps.b${i}_${bi}`, { defaultValue: b })}</span></li>
                       ))}
                     </ul>
                   </div>

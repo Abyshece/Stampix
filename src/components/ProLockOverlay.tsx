@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Lock, Sparkles } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ProLockOverlayProps {
   /** When true, the children are blurred/disabled and the upgrade overlay shows. */
@@ -19,6 +20,7 @@ interface ProLockOverlayProps {
  * Pro merchants get the children untouched — zero visual change.
  */
 export function ProLockOverlay({ locked, title, onUpgrade, children }: ProLockOverlayProps) {
+  const { t } = useTranslation();
   if (!locked) return <>{children}</>;
 
   return (
@@ -32,13 +34,13 @@ export function ProLockOverlay({ locked, title, onUpgrade, children }: ProLockOv
         </div>
         <p className="text-sm font-semibold text-[#37352F] mb-1">{title}</p>
         <p className="text-xs text-gray-500 mb-4 max-w-xs">
-          Upgrade to Stampfix Pro to unlock this.
+          {t('dash.prolock.unlock', { defaultValue: 'Upgrade to Stampfix Pro to unlock this.' })}
         </p>
         <button
           onClick={onUpgrade}
           className="inline-flex items-center gap-2 bg-[#37352F] text-white px-4 py-2 rounded-lg font-medium text-xs hover:bg-opacity-90 transition shadow-sm"
         >
-          <Sparkles className="w-3.5 h-3.5" /> Upgrade to Pro
+          <Sparkles className="w-3.5 h-3.5" /> {t('dash.prolock.upgradePro', { defaultValue: 'Upgrade to Pro' })}
         </button>
       </div>
     </div>

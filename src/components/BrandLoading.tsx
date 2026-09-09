@@ -4,7 +4,10 @@
 // with each shape pulsing in sequence. Shown while auth + campaign resolve so
 // the app never flashes the landing or signup screens before it settles.
 
+import { useTranslation } from 'react-i18next';
+
 export function BrandLoading() {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
       <style>{`
@@ -18,7 +21,7 @@ export function BrandLoading() {
         className="h-10 w-auto text-[#37352F]"
         fill="currentColor"
         role="img"
-        aria-label="Loading"
+        aria-label={t('dash.loading.aria', { defaultValue: 'Loading' })}
       >
         <rect className="sf-shape sf-square" x="8" y="12" width="66" height="66" rx="4" />
         <circle className="sf-shape sf-circle" cx="140" cy="45" r="34" />

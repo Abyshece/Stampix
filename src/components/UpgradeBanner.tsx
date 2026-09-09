@@ -2,6 +2,7 @@ import { Sparkles, AlertTriangle, ArrowRight, X } from 'lucide-react';
 import { FREE_TIER_CARD_LIMIT } from '../types';
 
 import { proPrice } from '../lib/pricing';
+import { useTranslation } from 'react-i18next';
 
 interface UpgradeBannerProps {
   customerCount: number;
@@ -28,6 +29,7 @@ interface UpgradeBannerProps {
  * opens the dashboard.
  */
 export function UpgradeBanner({ customerCount, country, onUpgrade, onDismiss }: UpgradeBannerProps) {
+  const { t } = useTranslation();
   if (customerCount < 8) return null;
   const atLimit = customerCount >= FREE_TIER_CARD_LIMIT;
 
@@ -42,21 +44,19 @@ export function UpgradeBanner({ customerCount, country, onUpgrade, onDismiss }: 
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-amber-900 flex items-center gap-2">
-              You've reached the free-tier limit
+              {t('dash.upgradeBanner.limitReached', { defaultValue: "You've reached the free-tier limit" })}
             </h3>
             <p className="text-sm text-amber-800 mt-1 leading-relaxed">
-              Your existing {customerCount} customers can keep collecting stamps as normal —
-              <strong> nothing changes for them.</strong> But new customers can't sign up
-              until you upgrade.
+              {t('dash.upgradeBanner.bodyA', { count: customerCount, defaultValue: 'Your existing {{count}} customers can keep collecting stamps as normal —' })} <strong>{t('dash.upgradeBanner.bodyBold', { defaultValue: 'nothing changes for them.' })}</strong> {t('dash.upgradeBanner.bodyB', { defaultValue: "But new customers can't sign up until you upgrade." })}
             </p>
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <button
                 onClick={onUpgrade}
                 className="bg-amber-600 text-white px-4 py-2 rounded-md font-medium text-sm hover:bg-amber-700 transition flex items-center gap-2 shadow-sm"
               >
-                <Sparkles className="w-4 h-4" /> Upgrade to Pro — {price}
+                <Sparkles className="w-4 h-4" /> {t('dash.upgradeBanner.upgradePrice', { price, defaultValue: 'Upgrade to Pro — {{price}}' })}
               </button>
-              <span className="text-xs text-amber-700">Unlimited customers, cancel anytime</span>
+              <span className="text-xs text-amber-700">{t('dash.upgradeBanner.unlimitedCancel', { defaultValue: 'Unlimited customers, cancel anytime' })}</span>
             </div>
           </div>
         </div>
@@ -72,7 +72,7 @@ export function UpgradeBanner({ customerCount, country, onUpgrade, onDismiss }: 
         <button
           onClick={onDismiss}
           className="absolute top-3 right-3 text-gray-400 hover:text-[#37352F] transition p-1"
-          aria-label="Dismiss"
+          aria-label={t('dash.upgradeBanner.dismiss', { defaultValue: 'Dismiss' })}
         >
           <X className="w-4 h-4" />
         </button>
@@ -83,14 +83,14 @@ export function UpgradeBanner({ customerCount, country, onUpgrade, onDismiss }: 
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm text-[#37352F]">
-            <strong>{remaining} customer {remaining === 1 ? 'slot' : 'slots'} left on the free plan.</strong>{' '}
-            <span className="text-gray-500">Upgrade to Pro for unlimited customers, {price}.</span>
+            <strong>{t(`dash.upgradeBanner.slotsA${remaining === 1 ? 'One' : 'Other'}`, { count: remaining, defaultValue: remaining === 1 ? '{{count}} customer slot left on the free plan.' : '{{count}} customer slots left on the free plan.' })}</strong>{' '}
+            <span className="text-gray-500">{t('dash.upgradeBanner.slotsB', { price, defaultValue: 'Upgrade to Pro for unlimited customers, {{price}}.' })}</span>
           </p>
           <button
             onClick={onUpgrade}
             className="mt-2 text-sm font-medium text-[#37352F] hover:underline inline-flex items-center gap-1"
           >
-            See Pro features <ArrowRight className="w-3 h-3" />
+            {t('dash.upgradeBanner.seePro', { defaultValue: 'See Pro features' })} <ArrowRight className="w-3 h-3" />
           </button>
         </div>
       </div>

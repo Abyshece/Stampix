@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { X, Tag } from 'lucide-react';
 import { listActivePromoBanners, type PromoBanner } from '../services/admin';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Top-of-page promo banner. Pulls active banners from the database
@@ -21,6 +22,7 @@ const VARIANT_STYLES: Record<PromoBanner['variant'], string> = {
 };
 
 export function PromoBannerBar() {
+  const { t } = useTranslation();
   const [banner, setBanner] = useState<PromoBanner | null>(null);
   const [dismissed, setDismissed] = useState(false);
 
@@ -68,7 +70,7 @@ export function PromoBannerBar() {
       <button
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDismiss(); }}
         className="opacity-70 hover:opacity-100 flex-shrink-0 -mr-1"
-        aria-label="Dismiss banner"
+        aria-label={t('dash.promo.dismissBanner', { defaultValue: 'Dismiss banner' })}
       >
         <X className="w-4 h-4" />
       </button>

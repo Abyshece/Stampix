@@ -4,6 +4,7 @@ import type { Campaign, UserCard, ActivityItem, Location, OnboardingState, Merch
 import { useAuth, signOut } from '../lib/auth';
 import { supabase } from '../lib/supabase';
 import { checkDailyCap } from '../services/stampGuard';
+import { useTranslation } from 'react-i18next';
 import { StampReasonModal } from './StampReasonModal';
 import {
   getCampaignByMerchant,
@@ -43,6 +44,7 @@ interface MerchantAppProps {
  * snappy without needing a heavyweight data layer like react-query.
  */
 export function MerchantApp({ onLogout, startOnLogin }: MerchantAppProps) {
+  const { t } = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [cards, setCards] = useState<UserCard[]>([]);
@@ -202,7 +204,7 @@ export function MerchantApp({ onLogout, startOnLogin }: MerchantAppProps) {
         setCards((prev) => prev.map((c) => (c.id === cardId ? updated : c)));
         refreshActivities();
       } catch (err) {
-        alert(err instanceof Error ? err.message : 'Stamp failed');
+        alert(err instanceof Error ? err.message : t('dash.shell.errStamp', { defaultValue: 'Stamp failed' }));
       }
     },
     [campaign, refreshActivities, cards],
@@ -218,7 +220,7 @@ export function MerchantApp({ onLogout, startOnLogin }: MerchantAppProps) {
         // Over the daily limit — make the person say why before it goes through.
         setPendingStamp({
           cardId,
-          customerName: card?.customerName ?? 'This customer',
+          customerName: card?.customerName ?? t('dash.shell.thisCustomer', { defaultValue: 'This customer' }),
           stampsToday: check.stampsToday,
           cap: check.cap,
         });
@@ -236,7 +238,7 @@ export function MerchantApp({ onLogout, startOnLogin }: MerchantAppProps) {
         setCards((prev) => prev.map((c) => (c.id === cardId ? updated : c)));
         refreshActivities();
       } catch (err) {
-        alert(err instanceof Error ? err.message : 'Reset failed');
+        alert(err instanceof Error ? err.message : t('dash.shell.errReset', { defaultValue: 'Reset failed' }));
       }
     },
     [refreshActivities],
@@ -252,7 +254,7 @@ export function MerchantApp({ onLogout, startOnLogin }: MerchantAppProps) {
         setCards((prev) => prev.map((c) => (c.id === cardId ? updated : c)));
         refreshActivities();
       } catch (err) {
-        alert(err instanceof Error ? err.message : 'Status update failed');
+        alert(err instanceof Error ? err.message : t('dash.shell.errStatus', { defaultValue: 'Status update failed' }));
       }
     },
     [cards, refreshActivities],
@@ -265,7 +267,7 @@ export function MerchantApp({ onLogout, startOnLogin }: MerchantAppProps) {
         setCards((prev) => prev.filter((c) => c.id !== cardId));
         refreshActivities();
       } catch (err) {
-        alert(err instanceof Error ? err.message : 'Delete failed');
+        alert(err instanceof Error ? err.message : t('dash.shell.errDelete', { defaultValue: 'Delete failed' }));
       }
     },
     [refreshActivities],
@@ -283,7 +285,7 @@ export function MerchantApp({ onLogout, startOnLogin }: MerchantAppProps) {
         setCards((prev) => [created, ...prev]);
         refreshActivities();
       } catch (err) {
-        alert(err instanceof Error ? err.message : 'Could not add customer');
+        alert(err instanceof Error ? err.message : t('dash.shell.errAddCustomer', { defaultValue: 'Could not add customer' }));
       }
     },
     [campaign, refreshActivities],
@@ -373,7 +375,7 @@ export function MerchantApp({ onLogout, startOnLogin }: MerchantAppProps) {
         const updated = await updateCampaign(campaign.id, patch);
         setCampaign(updated);
       } catch (err) {
-        alert(err instanceof Error ? err.message : 'Update failed');
+        alert(err instanceof Error ? err.message : t('dash.shell.errUpdate', { defaultValue: 'Update failed' }));
       }
     },
     [campaign],

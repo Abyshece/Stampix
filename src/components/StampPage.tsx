@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useMemo, useRef, type ReactNode } from 'react';
 import { selfServeStamp } from '../lib/db';
 import { playScanSound } from '../lib/scanSounds';
+import { useTranslation } from 'react-i18next';
 
 type Phase = 'locating' | 'stamping' | 'success' | 'need_identity' | 'ask_more' | 'pick_count' | 'ask_code' | 'error';
 
@@ -86,6 +87,7 @@ function StampShell({ children }: { children: ReactNode }) {
 }
 
 export function StampPage() {
+  const { t } = useTranslation();
   const params = new URLSearchParams(window.location.search);
   const campaignId = (params.get('campaign') ?? '').trim();
   const locationId = (params.get('location') ?? '').trim();
@@ -136,8 +138,8 @@ export function StampPage() {
     try {
       const r = await selfServeStamp(campaignId, locationId, coords.lat, coords.lng, email.trim() || undefined, multiCode.trim(), count);
       if (r.ok || r.error === 'card_full') { setResult({ currentStamps: r.currentStamps ?? 0, maxStamps: r.maxStamps ?? 0 }); setPhase('success'); playScanSound(r.error === 'card_full' ? 'last' : 'stamp'); }
-      else if (r.error === 'bad_code') { setCodeError("That code isn't right \u2014 ask the cashier again."); }
-      else if (r.error === 'no_code_set') { setCodeError("This shop hasn't set a code yet."); }
+      else if (r.error === 'bad_code') { setCodeError(t('cust.stamp.badCode', { defaultValue: "That code isn't right — ask the cashier again." })); }
+      else if (r.error === 'no_code_set') { setCodeError(t('cust.stamp.noCodeSet', { defaultValue: "This shop hasn't set a code yet." })); }
       else { setErrKey(r.error ?? 'network'); setErrExtra(''); setPhase('error'); }
     } catch (e) { setErrKey('network'); setErrExtra(e instanceof Error ? ': ' + e.message : ''); setPhase('error'); }
     finally { setSubmitting(false); }
@@ -166,7 +168,7 @@ export function StampPage() {
     return (
       <StampShell>
         <div className="animate-spin w-8 h-8 border-2 border-gray-300 border-t-[#37352F] rounded-full mb-4" />
-        <p className="text-gray-500">{phase === 'locating' ? "Checking you're at the shop…" : 'Adding your stamp…'}</p>
+        <p className="text-gray-500">{phase === 'locating' ? t('cust.stamp.locating', { defaultValue: "Checking you're at the shop…" }) : t('cust.stamp.stamping', { defaultValue: 'Adding your stamp…' })}</p>
       </StampShell>
     );
   }
@@ -178,18 +180,18 @@ export function StampPage() {
       <StampShell>
         <StampConfetti />
         <div className="text-6xl mb-2 animate-bounce">🎉</div>
-        <h1 className="text-2xl font-serif-display font-semibold mb-1">Stamp added!</h1>
-        <p className="text-gray-500 mb-5">{full ? 'Your card is full — claim your reward!' : `${result.currentStamps} of ${result.maxStamps} stamps`}</p>
+        <h1 className="text-2xl font-serif-display font-semibold mb-1">{t('cust.stamp.added', { defaultValue: 'Stamp added!' })}</h1>
+        <p className="text-gray-500 mb-5">{full ? t('cust.stamp.cardFull', { defaultValue: 'Your card is full — claim your reward!' }) : t('cust.stamp.ofStamps', { current: result.currentStamps, max: result.maxStamps, defaultValue: '{{current}} of {{max}} stamps' })}</p>
         <div className="flex flex-wrap justify-center gap-2 max-w-[240px] mb-8">
           {dots.map((f, i) => (
             <span key={i} className={`w-6 h-6 rounded-full border-2 ${f ? 'bg-[#37352F] border-[#37352F]' : 'border-gray-300'}`} />
           ))}
         </div>
         {(result && result.currentStamps < result.maxStamps) && (
-          <button onClick={() => { setCount(1); setMultiCode(''); setCodeError(''); setPhase('pick_count'); }} className="text-sm text-[#37352F] underline mb-4">Bought multiple orders? Add more stamps</button>
+          <button onClick={() => { setCount(1); setMultiCode(''); setCodeError(''); setPhase('pick_count'); }} className="text-sm text-[#37352F] underline mb-4">{t('cust.stamp.boughtMultiple', { defaultValue: 'Bought multiple orders? Add more stamps' })}</button>
         )}
-        <a href={email.trim() ? `/my-card?e=${encodeURIComponent(email.trim())}` : '/my-card'} className="bg-[#37352F] text-white px-6 py-3 rounded-lg font-medium hover:bg-opacity-90 transition">View &amp; save your card</a>
-        <p className="text-xs text-gray-400 mt-3 max-w-xs">Save it to Apple or Google Wallet so it updates on its own next time.</p>
+        <a href={email.trim() ? `/my-card?e=${encodeURIComponent(email.trim())}` : '/my-card'} className="bg-[#37352F] text-white px-6 py-3 rounded-lg font-medium hover:bg-opacity-90 transition">{t('cust.stamp.viewSave', { defaultValue: 'View & save your card' })}</a>
+        <p className="text-xs text-gray-400 mt-3 max-w-xs">{t('cust.stamp.saveHint', { defaultValue: 'Save it to Apple or Google Wallet so it updates on its own next time.' })}</p>
       </StampShell>
     );
   }
@@ -197,14 +199,14 @@ export function StampPage() {
   if (phase === 'need_identity') {
     return (
       <StampShell>
-        <h1 className="text-xl font-serif-display font-semibold mb-1">One quick check</h1>
-        <p className="text-gray-500 mb-5 max-w-xs">Just confirm the email you signed up with to collect your stamp.</p>
+        <h1 className="text-xl font-serif-display font-semibold mb-1">{t('cust.stamp.quickCheck', { defaultValue: 'One quick check' })}</h1>
+        <p className="text-gray-500 mb-5 max-w-xs">{t('cust.stamp.confirmEmail', { defaultValue: 'Just confirm the email you signed up with to collect your stamp.' })}</p>
         <div className="w-full max-w-xs space-y-3">
-          <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="you@email.com"
+          <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder={t('cust.stamp.emailPh', { defaultValue: 'you@email.com' })}
             className="w-full border notion-border rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300" />
           <button onClick={() => void attempt(true)} disabled={submitting || !email.trim()}
             className="w-full bg-[#37352F] text-white py-3 rounded-lg font-medium disabled:opacity-50 hover:bg-opacity-90 transition">
-            Get my stamp
+            {t('cust.stamp.getStamp', { defaultValue: 'Get my stamp' })}
           </button>
         </div>
       </StampShell>
@@ -215,11 +217,11 @@ export function StampPage() {
     return (
       <StampShell>
         <div className="text-5xl mb-3">🧾</div>
-        <h1 className="text-xl font-serif-display font-semibold mb-1">Already stamped</h1>
-        <p className="text-gray-500 mb-6 max-w-xs">Did you buy more than one? Add the extra stamps for this order.</p>
+        <h1 className="text-xl font-serif-display font-semibold mb-1">{t('cust.stamp.alreadyStamped', { defaultValue: 'Already stamped' })}</h1>
+        <p className="text-gray-500 mb-6 max-w-xs">{t('cust.stamp.boughtMoreQ', { defaultValue: 'Did you buy more than one? Add the extra stamps for this order.' })}</p>
         <div className="w-full max-w-xs space-y-2">
-          <button onClick={() => { setCount(1); setMultiCode(''); setCodeError(''); setPhase('pick_count'); }} className="w-full bg-[#37352F] text-white py-3 rounded-lg font-medium">Yes, bought multiple</button>
-          <button onClick={() => setPhase('success')} className="w-full text-gray-500 py-2 text-sm">No, that's all</button>
+          <button onClick={() => { setCount(1); setMultiCode(''); setCodeError(''); setPhase('pick_count'); }} className="w-full bg-[#37352F] text-white py-3 rounded-lg font-medium">{t('cust.stamp.yesMultiple', { defaultValue: 'Yes, bought multiple' })}</button>
+          <button onClick={() => setPhase('success')} className="w-full text-gray-500 py-2 text-sm">{t('cust.stamp.noThatsAll', { defaultValue: "No, that's all" })}</button>
         </div>
       </StampShell>
     );
@@ -228,10 +230,10 @@ export function StampPage() {
   if (phase === 'pick_count') {
     return (
       <StampShell>
-        <h1 className="text-xl font-serif-display font-semibold mb-1">How many more stamps?</h1>
-        <p className="text-gray-500 mb-4 max-w-xs">One per item you bought in this order.</p>
+        <h1 className="text-xl font-serif-display font-semibold mb-1">{t('cust.stamp.howManyMore', { defaultValue: 'How many more stamps?' })}</h1>
+        <p className="text-gray-500 mb-4 max-w-xs">{t('cust.stamp.onePerItem', { defaultValue: 'One per item you bought in this order.' })}</p>
         <CountWheel max={remaining} value={count} onChange={setCount} />
-        <button onClick={() => setPhase('ask_code')} className="mt-6 bg-[#37352F] text-white px-8 py-3 rounded-lg font-medium">Next</button>
+        <button onClick={() => setPhase('ask_code')} className="mt-6 bg-[#37352F] text-white px-8 py-3 rounded-lg font-medium">{t('cust.stamp.next', { defaultValue: 'Next' })}</button>
       </StampShell>
     );
   }
@@ -239,13 +241,13 @@ export function StampPage() {
   if (phase === 'ask_code') {
     return (
       <StampShell>
-        <h1 className="text-xl font-serif-display font-semibold mb-1">Ask the cashier for the code</h1>
-        <p className="text-gray-500 mb-5 max-w-xs">Enter the 4-digit code from the counter to add {count} stamp{count > 1 ? 's' : ''}.</p>
+        <h1 className="text-xl font-serif-display font-semibold mb-1">{t('cust.stamp.askCode', { defaultValue: 'Ask the cashier for the code' })}</h1>
+        <p className="text-gray-500 mb-5 max-w-xs">{t(`cust.stamp.enterCode${count > 1 ? 'Other' : 'One'}`, { count, defaultValue: count > 1 ? 'Enter the 4-digit code from the counter to add {{count}} stamps.' : 'Enter the 4-digit code from the counter to add {{count}} stamp.' })}</p>
         <div className="w-full max-w-xs space-y-3">
-          <input value={multiCode} onChange={(e) => setMultiCode(e.target.value.replace(/[^0-9]/g, '').slice(0, 4))} inputMode="numeric" placeholder="4-digit code" className="w-full border notion-border rounded-lg px-4 py-3 text-center text-2xl tracking-[0.4em]" />
+          <input value={multiCode} onChange={(e) => setMultiCode(e.target.value.replace(/[^0-9]/g, '').slice(0, 4))} inputMode="numeric" placeholder={t('cust.stamp.codePh', { defaultValue: '4-digit code' })} className="w-full border notion-border rounded-lg px-4 py-3 text-center text-2xl tracking-[0.4em]" />
           {codeError && <p className="text-xs text-red-600">{codeError}</p>}
-          <button onClick={() => void attemptMulti()} disabled={submitting || multiCode.length !== 4} className="w-full bg-[#37352F] text-white py-3 rounded-lg font-medium disabled:opacity-40">{submitting ? 'Adding…' : 'Add stamps'}</button>
-          <button onClick={() => setPhase('pick_count')} className="w-full text-gray-500 py-2 text-sm">Back</button>
+          <button onClick={() => void attemptMulti()} disabled={submitting || multiCode.length !== 4} className="w-full bg-[#37352F] text-white py-3 rounded-lg font-medium disabled:opacity-40">{submitting ? t('cust.stamp.adding', { defaultValue: 'Adding…' }) : t('cust.stamp.addStamps', { defaultValue: 'Add stamps' })}</button>
+          <button onClick={() => setPhase('pick_count')} className="w-full text-gray-500 py-2 text-sm">{t('cust.stamp.back', { defaultValue: 'Back' })}</button>
         </div>
       </StampShell>
     );
@@ -254,9 +256,9 @@ export function StampPage() {
   return (
     <StampShell>
       <div className="text-4xl mb-3">😕</div>
-      <p className="text-gray-600 max-w-xs mb-6">{(ERR[errKey] ?? 'Something went wrong. Please try again.') + errExtra}</p>
+      <p className="text-gray-600 max-w-xs mb-6">{t(`cust.stamp.err.${errKey}`, { defaultValue: ERR[errKey] ?? t('cust.stamp.generic', { defaultValue: 'Something went wrong. Please try again.' }) }) + errExtra}</p>
       {(errKey === 'too_far' || errKey === 'denied' || errKey === 'network') && (
-        <button onClick={tryAgain} className="bg-[#37352F] text-white px-6 py-3 rounded-lg font-medium hover:bg-opacity-90 transition">Try again</button>
+        <button onClick={tryAgain} className="bg-[#37352F] text-white px-6 py-3 rounded-lg font-medium hover:bg-opacity-90 transition">{t('cust.stamp.tryAgain', { defaultValue: 'Try again' })}</button>
       )}
     </StampShell>
   );

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 
 export interface CelebrationData {
   customerName: string;
@@ -53,30 +54,31 @@ export function ScanCelebration({ data, onClose }: { data: CelebrationData; onCl
     [big],
   );
 
+  const { t } = useTranslation();
   const emoji = redeemed ? '🎁' : unlocked ? '🎉' : oneMore ? '🔥' : '✨';
   const headline = redeemed
-    ? 'Reward redeemed!'
+    ? t('cust.celebrate.hRedeemed', { defaultValue: 'Reward redeemed!' })
     : unlocked
-    ? 'Reward unlocked!'
+    ? t('cust.celebrate.hUnlocked', { defaultValue: 'Reward unlocked!' })
     : oneMore
-    ? 'One more to go!'
-    : 'Stamp added!';
+    ? t('cust.celebrate.hOneMore', { defaultValue: 'One more to go!' })
+    : t('cust.celebrate.hStamp', { defaultValue: 'Stamp added!' });
   const sub = redeemed
-    ? `${data.customerName} just enjoyed “${data.offerTitle}”`
+    ? t('cust.celebrate.sRedeemed', { name: data.customerName, offer: data.offerTitle, defaultValue: '{{name}} just enjoyed “{{offer}}”' })
     : unlocked
-    ? `${data.customerName} earned “${data.offerTitle}”`
+    ? t('cust.celebrate.sUnlocked', { name: data.customerName, offer: data.offerTitle, defaultValue: '{{name}} earned “{{offer}}”' })
     : oneMore
-    ? `${data.customerName} needs just 1 more stamp`
-    : `Nice one, ${data.customerName}!`;
+    ? t('cust.celebrate.sOneMore', { name: data.customerName, defaultValue: '{{name}} needs just 1 more stamp' })
+    : t('cust.celebrate.sNice', { name: data.customerName, defaultValue: 'Nice one, {{name}}!' });
 
   const total = Math.min(data.maxStamps || 0, 12);
   const filled = redeemed ? total : Math.min(data.currentStamps, total);
 
   const pill = redeemed
-    ? 'Fresh card — back to zero ✨'
+    ? t('cust.celebrate.pFresh', { defaultValue: 'Fresh card — back to zero ✨' })
     : unlocked
-    ? 'Card complete 🎯'
-    : `${stampsLeft} stamp${stampsLeft === 1 ? '' : 's'} left to get a reward`;
+    ? t('cust.celebrate.pComplete', { defaultValue: 'Card complete 🎯' })
+    : t(`cust.celebrate.pLeft${stampsLeft === 1 ? 'One' : 'Other'}`, { count: stampsLeft, defaultValue: stampsLeft === 1 ? '{{count}} stamp left to get a reward' : '{{count}} stamps left to get a reward' });
 
   return createPortal(
     <div
@@ -153,7 +155,7 @@ export function ScanCelebration({ data, onClose }: { data: CelebrationData; onCl
           <p className="mt-2 text-[11px] text-gray-400">{data.offerTitle}</p>
         )}
 
-        <p className="mt-5 text-[11px] text-gray-300">tap anywhere to dismiss</p>
+        <p className="mt-5 text-[11px] text-gray-300">{t('cust.celebrate.tapDismiss', { defaultValue: 'tap anywhere to dismiss' })}</p>
       </div>
     </div>,
     document.body,

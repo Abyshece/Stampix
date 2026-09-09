@@ -1,10 +1,12 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const WELCOME_COLORS = ['#EA3323', '#F7CE46', '#1132F5', '#75FBFD', '#EA33B6', '#510AF5'];
 
 /** One-time welcome for a freshly-joined card: tells the customer to ask the
  *  counter to scan/tap the stamp QR, with a little confetti. */
 export function WelcomeModal({ onDismiss }: { onDismiss: () => void }) {
+  const { t } = useTranslation();
   const pieces = useMemo(
     () => Array.from({ length: 40 }, (_, i) => {
       const d = 2.2 + Math.random() * 1.8;
@@ -22,9 +24,9 @@ export function WelcomeModal({ onDismiss }: { onDismiss: () => void }) {
       </div>
       <div className="relative bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 text-center">
         <div className="text-5xl mb-2">🎉</div>
-        <h2 className="text-xl font-serif-display font-semibold mb-2">You&rsquo;re all set!</h2>
-        <p className="text-gray-600 text-sm mb-5">Your card is saved. To collect your first stamp, ask the staff at the counter &mdash; they&rsquo;ll show you the stamp QR to scan or tap. You&rsquo;ll earn a stamp on every order.</p>
-        <button onClick={onDismiss} className="w-full bg-[#37352F] text-white py-3 rounded-lg font-medium hover:bg-opacity-90 transition">Got it</button>
+        <h2 className="text-xl font-serif-display font-semibold mb-2">{t('cust.welcome.allSet', { defaultValue: "You're all set!" })}</h2>
+        <p className="text-gray-600 text-sm mb-5">{t('cust.welcome.body', { defaultValue: "Your card is saved. To collect your first stamp, ask the staff at the counter — they'll show you the stamp QR to scan or tap. You'll earn a stamp on every order." })}</p>
+        <button onClick={onDismiss} className="w-full bg-[#37352F] text-white py-3 rounded-lg font-medium hover:bg-opacity-90 transition">{t('cust.welcome.gotIt', { defaultValue: 'Got it' })}</button>
       </div>
     </div>
   );

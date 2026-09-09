@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 
 export interface RejectionData {
   /** The merchant's business name, so staff know which card to ask for. */
@@ -16,6 +17,7 @@ export interface RejectionData {
  * so the merchant can clearly see what went wrong, and dismisses on tap.
  */
 export function ScanRejection({ data, onClose }: { data: RejectionData; onClose: () => void }) {
+  const { t } = useTranslation();
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
   useEffect(() => {
@@ -71,16 +73,16 @@ export function ScanRejection({ data, onClose }: { data: RejectionData; onClose:
           </div>
         </div>
 
-        <h2 className="text-3xl font-serif-display font-semibold text-[#EA3323] leading-tight">Wrong card</h2>
+        <h2 className="text-3xl font-serif-display font-semibold text-[#EA3323] leading-tight">{t('cust.reject.wrongCard', { defaultValue: 'Wrong card' })}</h2>
         <p className="mt-2 text-sm text-gray-600 leading-relaxed">
-          This card isn’t from <span className="font-semibold text-[#37352F]">{data.businessName}</span>. It belongs to a different shop.
+          {t('cust.reject.notFromA', { defaultValue: 'This card isn’t from' })} <span className="font-semibold text-[#37352F]">{data.businessName}</span>{t('cust.reject.notFromB', { defaultValue: '. It belongs to a different shop.' })}
         </p>
 
         <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-red-50 text-red-700 px-4 py-2 text-sm font-medium">
-          Ask for their {data.businessName} card — or sign them up
+          {t('cust.reject.askFor', { name: data.businessName, defaultValue: 'Ask for their {{name}} card — or sign them up' })}
         </div>
 
-        <p className="mt-5 text-[11px] text-gray-300">tap anywhere to dismiss</p>
+        <p className="mt-5 text-[11px] text-gray-300">{t('cust.reject.tapDismiss', { defaultValue: 'tap anywhere to dismiss' })}</p>
       </div>
     </div>,
     document.body,

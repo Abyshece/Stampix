@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Password input with a click-to-reveal eye icon, matching common
@@ -31,6 +32,7 @@ export function PasswordInput({
   required?: boolean;
   id?: string;
 }) {
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
 
   return (
@@ -52,7 +54,7 @@ export function PasswordInput({
         type="button"
         onClick={() => setVisible(!visible)}
         tabIndex={-1}
-        aria-label={visible ? 'Hide password' : 'Show password'}
+        aria-label={visible ? t('form.password.hide', { defaultValue: 'Hide password' }) : t('form.password.show', { defaultValue: 'Show password' })}
         className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#37352F] p-1 transition"
       >
         {visible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}

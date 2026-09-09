@@ -12,6 +12,7 @@
  * text colour for contrast, so the Google card ignores cardTextColor.
  */
 import QRCode from 'react-qr-code';
+import { useTranslation } from 'react-i18next';
 
 interface PreviewSettings {
   businessName: string;
@@ -166,9 +167,10 @@ function GoogleCard({ s }: { s: PreviewSettings }) {
 }
 
 export function WalletLivePreview({ settings }: { settings: PreviewSettings }) {
+  const { t } = useTranslation();
   return (
     <div className="mb-6">
-      <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Live preview</p>
+      <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">{t('cust.card.livePreview', { defaultValue: 'Live preview' })}</p>
       <div className="flex flex-wrap gap-6 justify-center sm:justify-start items-start">
         <AppleCard s={settings} />
         <GoogleCard s={settings} />

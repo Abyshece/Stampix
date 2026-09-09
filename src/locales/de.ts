@@ -979,6 +979,20 @@ const de = {
       essentialOnly: 'Nur wesentliche',
       saveChoices: 'Auswahl speichern', acceptAll: 'Alle akzeptieren',
     },
+    card: {
+      errPass: 'Wallet-Pass konnte nicht erstellt werden',
+      holder: 'Inhaber', id: 'ID', joined: 'Beigetreten',
+      rotates: 'Code erneuert sich in {{count}}s', loadingCode: 'Sicherer Code wird geladen …',
+      saveCard: 'Karte speichern',
+      iosA: 'Tippen Sie in Safari auf', iosShare: 'Teilen', iosThen: ', dann auf', iosAddHome: 'Zum Home-Bildschirm', iosB: '. Ihre Karte bleibt einen Tipp entfernt.',
+      addTo: 'Hinzufügen zu',
+      livePreview: 'Live-Vorschau',
+    },
+  },
+  form: {
+    password: { hide: 'Passwort verbergen', show: 'Passwort anzeigen' },
+    country: { selectPh: 'Wählen Sie Ihr Land', searchPh: 'Länder suchen …', noMatches: 'Keine Treffer' },
+    phone: { code: 'Code', searchPh: 'Land suchen …', noMatches: 'Keine Treffer', ariaCode: 'Ländervorwahl', ariaPhone: 'Telefonnummer' },
   },
 };
 export default de;

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronDown, Search, Check } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 // ISO 3166-1 alpha-2 code + English name. Flags are derived from the code.
 const COUNTRIES: [string, string][] = [
@@ -58,12 +59,13 @@ function flagOf(iso: string): string {
 export function CountrySelect({
   value,
   onChange,
-  placeholder = 'Select your country',
+  placeholder,
 }: {
   value: string;
   onChange: (iso: string) => void;
   placeholder?: string;
 }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const ref = useRef<HTMLDivElement>(null);
@@ -103,7 +105,7 @@ export function CountrySelect({
               <span className="truncate">{selected[1]}</span>
             </>
           ) : (
-            <span className="text-gray-400">{placeholder}</span>
+            <span className="text-gray-400">{placeholder ?? t('form.country.selectPh', { defaultValue: 'Select your country' })}</span>
           )}
         </span>
         <ChevronDown className="w-4 h-4 text-gray-400 shrink-0" />
@@ -117,12 +119,12 @@ export function CountrySelect({
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search countries…"
+              placeholder={t('form.country.searchPh', { defaultValue: 'Search countries…' })}
               className="w-full text-sm bg-transparent focus:outline-none"
             />
           </div>
           <div className="max-h-60 overflow-y-auto py-1">
-            {filtered.length === 0 && <div className="px-4 py-3 text-xs text-gray-400">No matches</div>}
+            {filtered.length === 0 && <div className="px-4 py-3 text-xs text-gray-400">{t('form.country.noMatches', { defaultValue: 'No matches' })}</div>}
             {filtered.map(([iso, name]) => (
               <button
                 key={iso}

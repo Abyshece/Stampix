@@ -5,6 +5,7 @@ import { getSaveToWalletUrl } from '../services/googleWallet';
 import { issueStampToken } from '../services/stampToken';
 import { effectiveLogoColor } from '../lib/colors';
 import { Loader2, X, ShieldAlert } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface WalletCardProps {
   card: UserCard;
@@ -17,6 +18,7 @@ interface WalletCardProps {
 }
 
 export function WalletCard({ card, campaign, disableSave, staticQR }: WalletCardProps) {
+  const { t } = useTranslation();
   // The card's snapshot drives what the customer sees. This way an
   // existing customer keeps showing their original offer even after
   // the merchant changes the campaign. Fallbacks to campaign for cards
@@ -86,7 +88,7 @@ export function WalletCard({ card, campaign, disableSave, staticQR }: WalletCard
       // Open in a new tab; on Android this hands off to Google Wallet.
       window.open(url, '_blank', 'noopener,noreferrer');
     } catch (e) {
-      setErrorMsg(e instanceof Error ? e.message : 'Could not generate wallet pass');
+      setErrorMsg(e instanceof Error ? e.message : t('cust.card.errPass', { defaultValue: 'Could not generate wallet pass' }));
     } finally {
       setIsLoading(false);
     }
@@ -242,11 +244,11 @@ export function WalletCard({ card, campaign, disableSave, staticQR }: WalletCard
         <div className="relative bg-gray-50 border-t border-gray-100 px-5 py-5 z-10 shrink-0">
           <div className="mb-4 grid grid-cols-3 gap-2 items-end">
             <div>
-              <label className="text-[9px] uppercase tracking-widest text-gray-400 font-bold block mb-1">Holder</label>
+              <label className="text-[9px] uppercase tracking-widest text-gray-400 font-bold block mb-1">{t('cust.card.holder', { defaultValue: 'Holder' })}</label>
               <div className="text-xs font-bold tracking-tight text-gray-900 truncate">{card.customerName}</div>
             </div>
             <div className="text-center">
-              <label className="text-[9px] uppercase tracking-widest text-gray-400 font-bold block mb-1">ID</label>
+              <label className="text-[9px] uppercase tracking-widest text-gray-400 font-bold block mb-1">{t('cust.card.id', { defaultValue: 'ID' })}</label>
               {/* SF00XXX code, always visible. Customers read this aloud to a
                   cashier when the QR can't be scanned (broken phone, dim
                   screen, scanner camera issue). Monospace + slight weight
@@ -256,7 +258,7 @@ export function WalletCard({ card, campaign, disableSave, staticQR }: WalletCard
               </div>
             </div>
             <div className="text-right">
-              <label className="text-[9px] uppercase tracking-widest text-gray-400 font-bold block mb-1">Joined</label>
+              <label className="text-[9px] uppercase tracking-widest text-gray-400 font-bold block mb-1">{t('cust.card.joined', { defaultValue: 'Joined' })}</label>
               <div className="text-[10px] font-mono text-gray-500">{new Date(card.joinedAt).toLocaleDateString()}</div>
             </div>
           </div>
@@ -267,8 +269,8 @@ export function WalletCard({ card, campaign, disableSave, staticQR }: WalletCard
           {!staticQR && (
             <div className="mt-2 text-center text-[9px] uppercase tracking-widest text-gray-400">
               {tokenInfo
-                ? `Code rotates in ${secondsLeft}s`
-                : 'Loading secure code…'}
+                ? t('cust.card.rotates', { count: secondsLeft, defaultValue: 'Code rotates in {{count}}s' })
+                : t('cust.card.loadingCode', { defaultValue: 'Loading secure code…' })}
             </div>
           )}
         </div>
@@ -286,10 +288,10 @@ export function WalletCard({ card, campaign, disableSave, staticQR }: WalletCard
           return (
             <div className="w-full bg-[#F7F7F5] border notion-border rounded-[12px] p-3 text-center">
               <div className="text-[11px] uppercase tracking-wider text-gray-400 font-medium mb-1">
-                Save your card
+                {t('cust.card.saveCard', { defaultValue: 'Save your card' })}
               </div>
               <div className="text-xs text-gray-600 leading-relaxed">
-                Tap <strong>Share</strong> in Safari, then <strong>Add to Home Screen</strong>. Your card stays one tap away.
+                {t('cust.card.iosA', { defaultValue: 'Tap' })} <strong>{t('cust.card.iosShare', { defaultValue: 'Share' })}</strong> {t('cust.card.iosThen', { defaultValue: 'in Safari, then' })} <strong>{t('cust.card.iosAddHome', { defaultValue: 'Add to Home Screen' })}</strong>{t('cust.card.iosB', { defaultValue: '. Your card stays one tap away.' })}
               </div>
             </div>
           );
@@ -306,7 +308,7 @@ export function WalletCard({ card, campaign, disableSave, staticQR }: WalletCard
               <GoogleGLogo className="w-5 h-5" />
             )}
             <div className="text-left leading-none">
-              <div className="text-[8px] font-medium uppercase tracking-wide opacity-70">Add to</div>
+              <div className="text-[8px] font-medium uppercase tracking-wide opacity-70">{t('cust.card.addTo', { defaultValue: 'Add to' })}</div>
               <div className="text-[13px] font-semibold tracking-tight">Google Wallet</div>
             </div>
           </button>

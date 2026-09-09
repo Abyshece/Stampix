@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronDown, Search } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 /** Country dial-code dropdown (searchable, empty by default) + phone-number
  *  field. Reports the combined value (e.g. "+49 170 1234567") via onChange;
@@ -63,6 +64,7 @@ function flagOf(iso: string): string {
 }
 
 export function PhoneField({ onChange, onEnter, id }: { onChange: (v: string) => void; onEnter?: () => void; id?: string }) {
+  const { t } = useTranslation();
   const [idx, setIdx] = useState(-1); // empty by default — no country pre-selected
   const [number, setNumber] = useState('');
   const [open, setOpen] = useState(false);
@@ -97,7 +99,7 @@ export function PhoneField({ onChange, onEnter, id }: { onChange: (v: string) =>
           type="button"
           onClick={() => setOpen((v) => !v)}
           className="h-full flex items-center gap-1 bg-[#F7F7F5] border notion-border rounded-md px-2.5 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 whitespace-nowrap"
-          aria-label="Country code"
+          aria-label={t('form.phone.ariaCode', { defaultValue: 'Country code' })}
         >
           {sel ? (
             <>
@@ -105,7 +107,7 @@ export function PhoneField({ onChange, onEnter, id }: { onChange: (v: string) =>
               <span>{sel[2]}</span>
             </>
           ) : (
-            <span className="text-gray-400">Code</span>
+            <span className="text-gray-400">{t('form.phone.code', { defaultValue: 'Code' })}</span>
           )}
           <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
         </button>
@@ -117,12 +119,12 @@ export function PhoneField({ onChange, onEnter, id }: { onChange: (v: string) =>
                 autoFocus
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search country…"
+                placeholder={t('form.phone.searchPh', { defaultValue: 'Search country…' })}
                 className="w-full text-sm bg-transparent focus:outline-none"
               />
             </div>
             <div className="max-h-56 overflow-y-auto py-1">
-              {filtered.length === 0 && <div className="px-4 py-3 text-xs text-gray-400">No matches</div>}
+              {filtered.length === 0 && <div className="px-4 py-3 text-xs text-gray-400">{t('form.phone.noMatches', { defaultValue: 'No matches' })}</div>}
               {filtered.map(([c, i]) => (
                 <button
                   key={c[0]}
@@ -146,7 +148,7 @@ export function PhoneField({ onChange, onEnter, id }: { onChange: (v: string) =>
         onKeyDown={(e) => { if (e.key === 'Enter' && onEnter) onEnter(); }}
         className="flex-1 min-w-0 bg-[#F7F7F5] border notion-border rounded-md px-3 py-2.5 focus:outline-none focus:ring-1 focus:ring-gray-400 placeholder-gray-300"
         placeholder="170 1234567"
-        id={id} aria-label="Phone number"
+        id={id} aria-label={t('form.phone.ariaPhone', { defaultValue: 'Phone number' })}
       />
     </div>
   );

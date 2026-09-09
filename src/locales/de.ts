@@ -898,6 +898,33 @@ const de = {
       generic: 'Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.',
       tryAgain: 'Erneut versuchen',
     },
+    notFound: {
+      title: 'Seite nicht gefunden',
+      body: 'Die gesuchte Seite existiert nicht oder wurde verschoben.',
+      backHome: 'Zurück zur Startseite',
+    },
+    emailConfirmed: {
+      title: 'E-Mail bestätigt',
+      body: 'Ihre E-Mail-Adresse wurde verifiziert. Melden Sie sich an, um Ihren Arbeitsbereich einzurichten und mit dem Erstellen von Treuekarten zu beginnen.',
+      signIn: 'Anmelden',
+    },
+    unsubscribe: {
+      loadingH: 'Einen Moment …', loadingP: 'Ihre Einstellungen werden aktualisiert.',
+      doneH: 'Sie sind abgemeldet', doneP: 'Sie erhalten keine Marketing-E-Mails mehr für diese Karte. Wesentliche Nachrichten zu Ihrer Karte erhalten Sie weiterhin. Meinung geändert? Melden Sie sich einfach beim nächsten Besuch wieder an.',
+      notfoundH: 'Link nicht erkannt', notfoundP: 'Dieser Abmeldelink ist ungültig oder abgelaufen. Wenn Sie weiterhin unerwünschte E-Mails erhalten, antworten Sie auf eine davon und wir entfernen Sie.',
+      errorH: 'Etwas ist schiefgelaufen', errorP: 'Wir konnten Ihre Einstellungen gerade nicht aktualisieren. Bitte versuchen Sie es in einem Moment erneut.',
+      backStampfix: 'Zurück zu Stampfix',
+    },
+    cookie: {
+      title: 'Wir verwenden Cookies',
+      bodyA: 'Wir verwenden', essential: 'wesentliche', bodyB: 'Cookies, um Stampfix zu betreiben – Sie angemeldet zu halten, Zahlungen abzuwickeln und die Website sicher zu halten. Mit Ihrer Einwilligung nutzen wir außerdem Fehlerüberwachung, um Probleme zu erkennen und zu beheben. Wir verwenden keine Werbe- oder Tracking-Cookies. Siehe unsere',
+      cookiePolicy: 'Cookie-Richtlinie',
+      necessaryB: 'Unbedingt erforderlich', necessaryRest: '– erforderlich für Anmeldung, Zahlungen und Sicherheit. Immer aktiv.',
+      errorMonB: 'Fehlerüberwachung', errorMonRest: '– hilft uns, Fehler zu finden und zu beheben (Sentry). Keine Werbung; Ihre IP wird entfernt.',
+      customize: 'Anpassen',
+      essentialOnly: 'Nur wesentliche',
+      saveChoices: 'Auswahl speichern', acceptAll: 'Alle akzeptieren',
+    },
   },
 };
 export default de;

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import jsQR from 'jsqr';
 import { Camera, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface QRScannerProps {
   /** Called when a QR code is successfully decoded. Receives the raw payload. */
@@ -28,6 +29,7 @@ interface QRScannerProps {
  *    decodes QR codes at this resolution from ~30cm away.
  */
 export function QRScanner({ onScan, onClose, debounceMs = 2000 }: QRScannerProps) {
+  const { t } = useTranslation();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -71,11 +73,11 @@ export function QRScanner({ onScan, onClose, debounceMs = 2000 }: QRScannerProps
         const message =
           e instanceof Error
             ? e.name === 'NotAllowedError'
-              ? 'Camera permission denied. Allow access in your browser settings.'
+              ? t('dash.scanner.errDenied', { defaultValue: 'Camera permission denied. Allow access in your browser settings.' })
               : e.name === 'NotFoundError'
-                ? 'No camera found on this device.'
+                ? t('dash.scanner.errNoCamera', { defaultValue: 'No camera found on this device.' })
                 : e.message
-            : 'Could not access the camera';
+            : t('dash.scanner.errGeneric', { defaultValue: 'Could not access the camera' });
         setErrorMsg(message);
         setStatus('error');
       }
@@ -152,9 +154,9 @@ export function QRScanner({ onScan, onClose, debounceMs = 2000 }: QRScannerProps
           <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-white rounded-br-xl" />
         </div>
         <div className="mt-8 bg-black/60 backdrop-blur-md px-4 py-2 rounded-full text-white text-sm font-medium">
-          {status === 'starting' && 'Starting camera…'}
-          {status === 'scanning' && 'Point at a customer QR code'}
-          {status === 'error' && 'Camera unavailable'}
+          {status === 'starting' && t('dash.scanner.starting', { defaultValue: 'Starting camera…' })}
+          {status === 'scanning' && t('dash.scanner.point', { defaultValue: 'Point at a customer QR code' })}
+          {status === 'error' && t('dash.scanner.unavailable', { defaultValue: 'Camera unavailable' })}
         </div>
       </div>
 
@@ -167,7 +169,7 @@ export function QRScanner({ onScan, onClose, debounceMs = 2000 }: QRScannerProps
             onClick={onClose}
             className="mt-6 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-md text-sm transition"
           >
-            Close
+            {t('dash.scanner.close', { defaultValue: 'Close' })}
           </button>
         </div>
       )}
@@ -175,7 +177,7 @@ export function QRScanner({ onScan, onClose, debounceMs = 2000 }: QRScannerProps
       <button
         onClick={onClose}
         className="absolute top-4 right-4 bg-black/40 text-white p-2 rounded-full hover:bg-black/60 transition z-10"
-        aria-label="Close scanner"
+        aria-label={t('dash.scanner.closeScanner', { defaultValue: 'Close scanner' })}
       >
         <X className="w-5 h-5" />
       </button>

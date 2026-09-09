@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { Bell } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../lib/auth';
 import { listMerchantNotifications, markNotificationsRead, type NotificationRow } from '../lib/db';
 
 export function NotificationBell() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [items, setItems] = useState<NotificationRow[]>([]);
   const [readIds, setReadIds] = useState<Set<string>>(new Set());
@@ -36,7 +38,7 @@ export function NotificationBell() {
 
   return (
     <div className="relative" ref={ref}>
-      <button onClick={toggle} className="relative p-2 rounded-md border notion-border bg-white hover:bg-[#F7F7F5] transition" aria-label="Notifications">
+      <button onClick={toggle} className="relative p-2 rounded-md border notion-border bg-white hover:bg-[#F7F7F5] transition" aria-label={t('dash.notif.ariaLabel', { defaultValue: 'Notifications' })}>
         <Bell className="w-4 h-4 text-gray-600" />
         {unread > 0 && (
           <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
@@ -47,8 +49,8 @@ export function NotificationBell() {
 
       {open && (
         <div className="absolute left-0 md:left-auto md:right-0 mt-2 w-80 max-w-[calc(100vw-1.5rem)] max-h-96 overflow-y-auto rounded-xl border notion-border bg-white shadow-lg z-50">
-          <div className="px-4 py-2.5 border-b notion-border text-xs font-bold uppercase tracking-wider text-gray-500">Notifications</div>
-          {items.length === 0 && <div className="px-4 py-6 text-sm text-gray-400 text-center">Nothing new right now.</div>}
+          <div className="px-4 py-2.5 border-b notion-border text-xs font-bold uppercase tracking-wider text-gray-500">{t('dash.notif.title', { defaultValue: 'Notifications' })}</div>
+          {items.length === 0 && <div className="px-4 py-6 text-sm text-gray-400 text-center">{t('dash.notif.empty', { defaultValue: 'Nothing new right now.' })}</div>}
           {items.map((n) => (
             <div key={n.id} className="px-4 py-3 border-b notion-border last:border-0">
               <div className="text-sm font-semibold text-[#37352F]">{n.title}</div>

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { WalletPass, type CardSpec } from './HeroCardLoop';
+import { useTranslation } from 'react-i18next';
 
 /**
  * The two colourful landing feature visuals, replacing the old grey/black
@@ -39,21 +40,22 @@ const GLOW =
   'radial-gradient(closest-side, #FBCFE8, transparent) 72% 58%/46% 62% no-repeat';
 
 export function WalletFanVisual() {
+  const { t } = useTranslation();
   return (
     <div className="relative flex items-center justify-center h-[360px] sm:h-[440px] overflow-hidden">
       <div className="pointer-events-none absolute inset-0 blur-3xl opacity-50" style={{ background: GLOW }} />
 
       {/* left card (behind) */}
       <div className="absolute left-1/2 top-1/2" style={{ transform: 'translate(-50%,-50%) translateX(-74px) rotate(-12deg) scale(0.72)', zIndex: 10 }}>
-        <div style={{ animation: 'sf-float 7s ease-in-out infinite' }}><WalletPass spec={FAN[0]} /></div>
+        <div style={{ animation: 'sf-float 7s ease-in-out infinite' }}><WalletPass spec={{ ...FAN[0], reward: t('landing.hero.r6', { defaultValue: FAN[0].reward }) }} /></div>
       </div>
       {/* right card (behind) */}
       <div className="absolute left-1/2 top-1/2" style={{ transform: 'translate(-50%,-50%) translateX(74px) rotate(12deg) scale(0.72)', zIndex: 20 }}>
-        <div style={{ animation: 'sf-float 7s ease-in-out infinite 1.3s' }}><WalletPass spec={FAN[2]} /></div>
+        <div style={{ animation: 'sf-float 7s ease-in-out infinite 1.3s' }}><WalletPass spec={{ ...FAN[2], reward: t('landing.hero.r1', { defaultValue: FAN[2].reward }) }} /></div>
       </div>
       {/* centre card (front) */}
       <div className="absolute left-1/2 top-1/2 drop-shadow-2xl" style={{ transform: 'translate(-50%,-50%) scale(0.82)', zIndex: 30 }}>
-        <div style={{ animation: 'sf-float 6s ease-in-out infinite 0.5s' }}><WalletPass spec={FAN[1]} /></div>
+        <div style={{ animation: 'sf-float 6s ease-in-out infinite 0.5s' }}><WalletPass spec={{ ...FAN[1], reward: t('landing.hero.r0', { defaultValue: FAN[1].reward }) }} /></div>
       </div>
 
       <style>{`@keyframes sf-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}`}</style>
@@ -69,6 +71,7 @@ const BARS = [
 ];
 
 export function InsightsVisual() {
+  const { t } = useTranslation();
   const { ref, inView } = useInView<HTMLDivElement>();
   return (
     <div ref={ref} className="relative bg-white border notion-border rounded-2xl p-6 shadow-sm">
@@ -82,16 +85,16 @@ export function InsightsVisual() {
           </div>
           <div>
             <div className="text-lg font-bold text-[#37352F] leading-none">1,248</div>
-            <div className="text-xs text-gray-500 mt-1">regulars this month</div>
+            <div className="text-xs text-gray-500 mt-1">{t('landing.insightsViz.regulars', { defaultValue: 'regulars this month' })}</div>
           </div>
         </div>
         <div className="flex items-center gap-1.5 text-xs font-medium text-green-600">
-          <span className="w-2 h-2 rounded-full bg-green-500" /> Live
+          <span className="w-2 h-2 rounded-full bg-green-500" /> {t('landing.insightsViz.live', { defaultValue: 'Live' })}
         </div>
       </div>
 
       {/* chart */}
-      <div className="text-xs font-bold text-gray-700 mb-3">Visit frequency</div>
+      <div className="text-xs font-bold text-gray-700 mb-3">{t('landing.insightsViz.visitFreq', { defaultValue: 'Visit frequency' })}</div>
       <div className="flex items-end justify-between gap-2 h-32 border-b notion-border">
         {BARS.map((b, i) => (
           <div

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import QRCode from 'react-qr-code';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Hero card loop.
@@ -67,6 +68,7 @@ function Stamp({ index, filled, color }: { index: number; filled: boolean; color
 
 /** A single wallet pass, drawn to match the real Apple Wallet card. */
 export function WalletPass({ spec }: { spec: CardSpec }) {
+  const { t } = useTranslation();
   const left = MAX_STAMPS - spec.stamps;
 
   return (
@@ -86,7 +88,7 @@ export function WalletPass({ spec }: { spec: CardSpec }) {
           <span className="text-[12px] font-bold leading-none truncate">{spec.name}</span>
         </div>
         <div className="text-right shrink-0 pl-2">
-          <div className="text-[7px] font-bold uppercase tracking-[0.12em] leading-none">Stamps left</div>
+          <div className="text-[7px] font-bold uppercase tracking-[0.12em] leading-none">{t('landing.hero.stampsLeft', { defaultValue: 'Stamps left' })}</div>
           <div className="text-[19px] font-medium leading-none mt-1.5">{left}</div>
         </div>
       </div>
@@ -101,13 +103,13 @@ export function WalletPass({ spec }: { spec: CardSpec }) {
       {/* Member / reward */}
       <div className="mt-5 flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="text-[6.5px] font-bold uppercase tracking-[0.14em] leading-none">Member</div>
+          <div className="text-[6.5px] font-bold uppercase tracking-[0.14em] leading-none">{t('landing.hero.member', { defaultValue: 'Member' })}</div>
           <div className="text-[12px] leading-tight mt-1 truncate">Lucky Müller</div>
         </div>
         <div className="text-right min-w-0">
-          <div className="text-[6.5px] font-bold uppercase tracking-[0.14em] leading-none">Reward</div>
+          <div className="text-[6.5px] font-bold uppercase tracking-[0.14em] leading-none">{t('landing.hero.reward', { defaultValue: 'Reward' })}</div>
           <div className="text-[12px] leading-tight mt-1">
-            {left === 0 ? 'Redeem your free reward now' : spec.reward}
+            {left === 0 ? t('landing.hero.redeemNow', { defaultValue: 'Redeem your free reward now' }) : spec.reward}
           </div>
         </div>
       </div>
@@ -122,6 +124,7 @@ export function WalletPass({ spec }: { spec: CardSpec }) {
 }
 
 export function HeroCardLoop() {
+  const { t } = useTranslation();
   const cardRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [picked, setPicked] = useState<number | null>(null);
   const pickedRef = useRef<number | null>(null);
@@ -242,7 +245,7 @@ export function HeroCardLoop() {
             e.stopPropagation();
             setPicked((p) => (p === i ? null : i));
           }}
-          aria-label={`${spec.name} loyalty card`}
+          aria-label={t('landing.hero.cardAria', { name: spec.name, defaultValue: '{{name}} loyalty card' })}
           className={`absolute left-1/2 top-1/2 rounded-[22px] p-0 border-0 bg-transparent cursor-pointer
             transition-shadow duration-300 will-change-transform
             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#37352F] focus-visible:ring-offset-4
@@ -250,7 +253,7 @@ export function HeroCardLoop() {
               ? 'shadow-[0_44px_64px_-22px_rgba(20,20,30,0.5)]'
               : 'shadow-[0_16px_36px_-14px_rgba(20,20,30,0.35)]'}`}
         >
-          <WalletPass spec={spec} />
+          <WalletPass spec={{ ...spec, reward: t(`landing.hero.r${i}`, { defaultValue: spec.reward }) }} />
         </button>
       ))}
     </section>

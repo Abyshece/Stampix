@@ -2,6 +2,7 @@ import { useState, useEffect, type ReactNode } from 'react';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { MarketingLayout, Eyebrow, StartButton , GradientBanner } from './MarketingLayout';
 import { listPublishedBlogPosts } from '../../lib/db';
+import { useTranslation } from 'react-i18next';
 
 function setMetaDescription(content: string) {
   let m = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
@@ -149,22 +150,24 @@ const POSTS: Post[] = [
 ];
 
 function PostCard({ post }: { post: Post }) {
+  const { t } = useTranslation();
   return (
     <a href={`/blog/${post.slug}`} className="group block border notion-border rounded-2xl p-7 hover:shadow-md transition">
       <div className="flex items-center gap-3 text-xs text-gray-400 mb-3">
         <span className="font-medium text-[#37352F] bg-[#F7F7F5] border notion-border rounded-full px-2.5 py-0.5">{post.tag}</span>
         <span>{post.date}</span>
         <span>&middot;</span>
-        <span>{post.readMins} min read</span>
+        <span>{post.readMins} {t('blog.minRead', { defaultValue: 'min read' })}</span>
       </div>
       <h2 className="text-xl font-serif-display font-semibold mb-2 group-hover:text-[#37352F]">{post.title}</h2>
       <p className="text-sm text-gray-600 leading-relaxed mb-4">{post.excerpt}</p>
-      <span className="inline-flex items-center gap-1 text-sm font-medium text-[#37352F]">Read <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition" /></span>
+      <span className="inline-flex items-center gap-1 text-sm font-medium text-[#37352F]">{t('blog.read', { defaultValue: 'Read' })} <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition" /></span>
     </a>
   );
 }
 
 export function BlogPage() {
+  const { t } = useTranslation();
   const path = window.location.pathname;
   const slug = path.startsWith('/blog/') ? path.slice('/blog/'.length).replace(/\/$/, '') : '';
   const [dbPosts, setDbPosts] = useState<Post[] | null>(null);
@@ -178,7 +181,7 @@ export function BlogPage() {
       }))))
       .catch(() => setDbPosts([]));
   }, []);
-  const allPosts = [...(dbPosts ?? []), ...POSTS];
+  const allPosts = [...(dbPosts ?? []), ...POSTS.map((p) => ({ ...p, title: t(`blog.p.${p.slug}.title`, { defaultValue: p.title }), excerpt: t(`blog.p.${p.slug}.excerpt`, { defaultValue: p.excerpt }), tag: t(`blog.p.${p.slug}.tag`, { defaultValue: p.tag }) }))];
   const post = slug ? allPosts.find((p) => p.slug === slug) : undefined;
   useEffect(() => {
     if (!post) return;
@@ -191,7 +194,7 @@ export function BlogPage() {
     return () => { document.title = prev; document.getElementById('blog-jsonld')?.remove(); };
   }, [post]);
   if (slug && !post && dbPosts === null) {
-    return <MarketingLayout active="/blog"><div className="py-32 text-center text-gray-400">Loading\u2026</div></MarketingLayout>;
+    return <MarketingLayout active="/blog"><div className="py-32 text-center text-gray-400">{t('blog.loading', { defaultValue: 'Loading…' })}</div></MarketingLayout>;
   }
 
   // Individual post
@@ -200,16 +203,16 @@ export function BlogPage() {
       <MarketingLayout active="/blog">
         <article className="max-w-2xl mx-auto px-6 pt-16 pb-8">
           <a href="/blog" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-[#37352F] mb-8 transition">
-            <ArrowLeft className="w-4 h-4" /> All posts
+            <ArrowLeft className="w-4 h-4" /> {t('blog.allPosts', { defaultValue: 'All posts' })}
           </a>
           <div className="flex items-center gap-3 text-xs text-gray-400 mb-4">
             <span className="font-medium text-[#37352F] bg-[#F7F7F5] border notion-border rounded-full px-2.5 py-0.5">{post.tag}</span>
-            <span>{post.date}</span><span>&middot;</span><span>{post.readMins} min read</span>
+            <span>{post.date}</span><span>&middot;</span><span>{post.readMins} {t('blog.minRead', { defaultValue: 'min read' })}</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-serif-display font-medium leading-[1.1] tracking-tight mb-8">{post.title}</h1>
           <div className="text-[16px] text-gray-700">{post.body}</div>
         </article>
-        <GradientBanner title="Ready to retire the paper card?" buttonLabel="Start your free trial" />
+        <GradientBanner title={t('blog.bannerTitle', { defaultValue: 'Ready to retire the paper card?' })} buttonLabel={t('blog.bannerCta', { defaultValue: 'Start your free trial' })} />
       </MarketingLayout>
     );
   }
@@ -218,11 +221,11 @@ export function BlogPage() {
   return (
     <MarketingLayout active="/blog">
       <section className="max-w-3xl mx-auto px-6 pt-20 pb-10 text-center">
-        <Eyebrow>The Merchant Academy</Eyebrow>
+        <Eyebrow>{t('blog.eyebrow', { defaultValue: 'The Merchant Academy' })}</Eyebrow>
         <h1 className="text-4xl md:text-6xl font-serif-display font-medium mt-6 mb-5 leading-[1.1] tracking-tight">
-          Notes on loyalty, retention, and running a modern local shop.
+          {t('blog.h1', { defaultValue: 'Notes on loyalty, retention, and running a modern local shop.' })}
         </h1>
-        <p className="text-lg text-gray-500">Short, practical reads for independent merchants.</p>
+        <p className="text-lg text-gray-500">{t('blog.sub', { defaultValue: 'Short, practical reads for independent merchants.' })}</p>
       </section>
       <section className="max-w-4xl mx-auto px-6 py-8">
         <div className="grid md:grid-cols-2 gap-5">
